@@ -347,7 +347,7 @@ class _MainPageState extends State<MainPage>
               LogicalKeyboardKey.keyZ): const RedoIntent(),
           LogicalKeySet(LogicalKeyboardKey.space):
               const MoveCardsToFoundationIntent(),
-          LogicalKeySet(LogicalKeyboardKey.keyD): const DrawFromStockIntent(),
+          // LogicalKeySet(LogicalKeyboardKey.keyD): const DrawFromStockIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>>{
@@ -392,15 +392,15 @@ class _MainPageState extends State<MainPage>
                 return null;
               },
             ),
-            DrawFromStockIntent: CallbackAction<DrawFromStockIntent>(
-                onInvoke: (DrawFromStockIntent intent) {
-              if (canUseShortcut) {
-                setState(() {
-                  drawFromStockPile();
-                });
-              }
-              return null;
-            }),
+            // DrawFromStockIntent: CallbackAction<DrawFromStockIntent>(
+            //     onInvoke: (DrawFromStockIntent intent) {
+            //   if (canUseShortcut) {
+            //     setState(() {
+            //       drawFromStockPile();
+            //     });
+            //   }
+            //   return null;
+            // }),
           },
           child: Focus(
             autofocus: true,
@@ -524,7 +524,7 @@ class _MainPageState extends State<MainPage>
         SolitaireCard.fromStandardCard(ace.of(Suit.spades), isFaceDown: true);
     return Tooltip(
       key: pileKeys[pile],
-      message: '翻开 (D)',
+      message: '翻开',
       waitDuration: const Duration(seconds: 1),
       child: Stack(
         alignment: Alignment.center,
@@ -544,7 +544,6 @@ class _MainPageState extends State<MainPage>
                     width: cardWidth,
                     onTap: () {
                       if(pile.size>0){
-                        print(pile.size);
                         drawFromStockPile();
                       }else{
 
@@ -558,6 +557,16 @@ class _MainPageState extends State<MainPage>
                       color: Theme.of(context).hintColor,
                     ),
                   ),
+                  if(pile.size == 0)
+                    Center(
+                      child: IconButton(
+                        icon:const Icon(Icons.refresh),
+                        color: Theme.of(context).hintColor,
+                        onPressed: (){
+                          //TODO:重置
+                        },
+                      ),
+                    ),
                 ],
               );
             },
@@ -641,7 +650,6 @@ class _MainPageState extends State<MainPage>
   }
 
   void drawFromStockPile() {
-    // TODO: Fix animations when spamming tap
     setState(() {
       StockPileMove move = game.drawFromStock();
       releasedNotifier.value = null;
