@@ -1,15 +1,15 @@
 import 'dart:collection';
 import 'dart:math';
-import 'dart:ui';
 
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:quards/models/deck.dart';
 import 'package:quards/models/games/solitaire/card.dart';
 import 'package:quards/models/games/solitaire/moves.dart';
 import 'package:quards/models/games/solitaire/solitaire.dart';
 import 'package:quards/models/shortcuts/intents.dart';
-import 'package:quards/models/deck.dart';
 
 import 'models/games/solitaire/pile.dart';
 import 'widgets/draggable_card.dart';
@@ -18,11 +18,18 @@ import 'widgets/poker_card.dart';
 
 void main() {
   runApp(Quards());
+  doWhenWindowReady(() {
+    appWindow.title = "Quards Solitaire";
+    const initialSize = Size(1200, 700);
+    appWindow.minSize = initialSize;
+    appWindow.size = initialSize;
+    appWindow.alignment = Alignment.center;
+    appWindow.show();
+  });
 }
 
 class Quards extends StatelessWidget {
   Quards({Key? key}) : super(key: key);
-  // This widget is the root of your application.
 
   final ThemeData data = ThemeData(
     brightness: Brightness.dark,
@@ -35,17 +42,14 @@ class Quards extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'quards - solitaire',
-      theme:
-          data.copyWith(textTheme: GoogleFonts.alataTextTheme(data.textTheme)),
-      home: const MainPage(title: 'quards - solitaire'),
+      theme: data.copyWith(textTheme: GoogleFonts.alataTextTheme(data.textTheme)),
+      home: const MainPage(),
     );
   }
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const MainPage({Key? key}) : super(key: key);
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -96,6 +100,7 @@ class _MainPageState extends State<MainPage>
     game.won.addListener(onGameWinUpdate);
   }
 
+  //完成时展示动画
   void onGameWinUpdate() {
     if (game.won.value) {
       winAnimationController.forward(from: 0);
@@ -103,18 +108,6 @@ class _MainPageState extends State<MainPage>
   }
 
   double calculateScreenUnit() {
-    // UI width:
-    // <-64dp buttons-><-G-><-card-><-2G-><-T-><-G-><-IconButton-><-F->
-
-    // Tableau (T):
-    // 7x (cardWidth + gutterWidth)
-
-    // IconButton:
-    // 48dp
-
-    // Foundations (F):
-    // cardWidth + 2 * gutterWidth
-
     // Total width = 9 cardWidth + 13 gutterWidth + 64dp + 44dp
     final double screenWidth = MediaQuery.of(context).size.width;
 
@@ -199,7 +192,7 @@ class _MainPageState extends State<MainPage>
                           child: Column(
                             children: [
                               IconButton(
-                                tooltip: 'New game (R)',
+                                tooltip: '新游戏 (R)',
                                 onPressed: () {
                                   setState(() {
                                     startNewGame(context);
@@ -209,7 +202,7 @@ class _MainPageState extends State<MainPage>
                               ),
                               const Divider(),
                               IconButton(
-                                tooltip: 'Undo (Ctrl-Z)',
+                                tooltip: '撤销 (Ctrl-Z)',
                                 onPressed: game.canUndo()
                                     ? () {
                                         undoPreviousMove();
@@ -218,7 +211,7 @@ class _MainPageState extends State<MainPage>
                                 icon: const Icon(Icons.undo),
                               ),
                               IconButton(
-                                tooltip: 'Redo (Ctrl-Shift Z/Ctrl-Y)',
+                                tooltip: '重做 (Ctrl-Shift Z/Ctrl-Y)',
                                 onPressed: game.canRedo()
                                     ? () {
                                         redoPreviousMove();
@@ -252,7 +245,7 @@ class _MainPageState extends State<MainPage>
                                 }
                               : null,
                           icon: const Icon(Icons.arrow_right_alt),
-                          tooltip: 'Move cards to foundation (Space)',
+                          tooltip: '自动移入suitpiles (Space)',
                         ),
                         Column(
                           mainAxisSize: MainAxisSize.min,
@@ -289,7 +282,7 @@ class _MainPageState extends State<MainPage>
                               );
                             },
                             child: Text(
-                              'You won!',
+                              '恭喜你赢了游戏!',
                               style: Theme.of(context).textTheme.headline3,
                             ),
                           ),
@@ -301,7 +294,7 @@ class _MainPageState extends State<MainPage>
                               });
                             },
                             icon: const Icon(Icons.refresh),
-                            label: const Text('New game'),
+                            label: const Text('新游戏'),
                           )
                         ],
                       ),
@@ -316,15 +309,13 @@ class _MainPageState extends State<MainPage>
     );
   }
 
+  //绘制左下角标志
   Widget _buildAppTitle() {
     return Stack(
       children: [
         Text(
           'quards',
           style: Theme.of(context).textTheme.headline2?.copyWith(
-                // color: Theme.of(context)
-                //     .hintColor
-                //     .withOpacity(0.1),
                 foreground: Paint()
                   ..style = PaintingStyle.stroke
                   ..strokeWidth = 8
@@ -336,16 +327,13 @@ class _MainPageState extends State<MainPage>
           style: Theme.of(context).textTheme.headline2?.copyWith(
                 color: Color.lerp(Theme.of(context).hintColor,
                     Theme.of(context).scaffoldBackgroundColor, 0.9),
-                // foreground: Paint()
-                //   ..style = PaintingStyle.stroke
-                //   ..strokeWidth = 6
-                //   ..color = Colors.white,
               ),
         ),
       ],
     );
   }
 
+  //绑定快捷键
   Widget _buildShortcuts({required Widget child}) {
     bool canUseShortcut = draggedLocation == null;
     return Shortcuts(
@@ -370,6 +358,7 @@ class _MainPageState extends State<MainPage>
                     if (game.canUndo()) undoPreviousMove();
                   });
                 }
+                return null;
               },
             ),
             RedoIntent: CallbackAction<RedoIntent>(
@@ -379,6 +368,7 @@ class _MainPageState extends State<MainPage>
                     if (game.canRedo()) redoPreviousMove();
                   });
                 }
+                return null;
               },
             ),
             NewGameIntent: CallbackAction<NewGameIntent>(
@@ -388,6 +378,7 @@ class _MainPageState extends State<MainPage>
                     startNewGame(context);
                   });
                 }
+                return null;
               },
             ),
             MoveCardsToFoundationIntent:
@@ -398,6 +389,7 @@ class _MainPageState extends State<MainPage>
                     game.makeAllPossibleFoundationMoves();
                   });
                 }
+                return null;
               },
             ),
             DrawFromStockIntent: CallbackAction<DrawFromStockIntent>(
@@ -407,6 +399,7 @@ class _MainPageState extends State<MainPage>
                   drawFromStockPile();
                 });
               }
+              return null;
             }),
           },
           child: Focus(
@@ -438,13 +431,17 @@ class _MainPageState extends State<MainPage>
         },
         onHover: (bool hovered) {
           if (hovered) {
-            setState(() {
-              hoveredLocation = location;
-            });
+            if(mounted){
+              setState(() {
+                hoveredLocation = location;
+              });
+            }
           } else {
-            setState(() {
-              hoveredLocation = null;
-            });
+            if(mounted) {
+              setState(() {
+                hoveredLocation = null;
+              });
+            }
           }
         },
         onDragStart: () {
@@ -527,7 +524,7 @@ class _MainPageState extends State<MainPage>
         SolitaireCard.fromStandardCard(ace.of(Suit.spades), isFaceDown: true);
     return Tooltip(
       key: pileKeys[pile],
-      message: 'Draw (D)',
+      message: '翻开 (D)',
       waitDuration: const Duration(seconds: 1),
       child: Stack(
         alignment: Alignment.center,
@@ -541,18 +538,20 @@ class _MainPageState extends State<MainPage>
               return Stack(
                 alignment: Alignment.center,
                 children: [
-                  // _buildPile(pile, verticalCardOffset: Offset.zero),
-                  // if (pile.topCard != null)
-                  //   _buildCard(pile.topCard!,
-                  //       SolitaireCardLocation(row: pile.size - 1, pile: pile)),
                   PokerCard(
                     card: card,
                     elevation: elevation,
                     width: cardWidth,
                     onTap: () {
-                      drawFromStockPile();
+                      if(pile.size>0){
+                        print(pile.size);
+                        drawFromStockPile();
+                      }else{
+
+                      }
                     },
                   ),
+                  if(pile.size>0)
                   Center(
                     child: Icon(
                       Icons.pan_tool,
@@ -644,19 +643,17 @@ class _MainPageState extends State<MainPage>
   void drawFromStockPile() {
     // TODO: Fix animations when spamming tap
     setState(() {
-      // StockPileMove move =
-      game.drawFromStock();
+      StockPileMove move = game.drawFromStock();
       releasedNotifier.value = null;
-      // final Offset initialOffset = _getOffset(move.origin);
-      // releasedCardOrigin[move.card.standardCard] = move.origin;
-      // releasedCardDestination[move.card.standardCard] = move.destination;
-      // final acceptedPile = move.destination.pile;
-      // releasedNotifier.value = HoverReleaseDetails(
-      //     card: move.card.standardCard,
-      //     acceptedPile: acceptedPile,
-      //     offset: initialOffset);
+      final Offset initialOffset = _getOffset(move.origin);
+      releasedCardOrigin[move.card.standardCard] = move.origin;
+      releasedCardDestination[move.card.standardCard] = move.destination;
+      final acceptedPile = move.destination.pile;
+      releasedNotifier.value = HoverReleaseDetails(
+          card: move.card.standardCard,
+          acceptedPile: acceptedPile,
+          offset: initialOffset);
     });
-    // game.redo();
   }
 
   void startNewGame(BuildContext context) {
@@ -672,9 +669,9 @@ class _MainPageState extends State<MainPage>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       width: 300,
-      content: const Text('New game started'),
+      content: const Text('已开始新游戏'),
       action: SnackBarAction(
-        label: 'Undo',
+        label: '撤销',
         onPressed: () {
           setState(() {
             game = thisGame;
