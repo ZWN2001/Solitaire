@@ -239,7 +239,9 @@ class SolitaireCardLocation extends Equatable {
     required this.row,
     required this.pile,
   });
+  //牌数
   final int row;
+  //牌堆
   final SolitairePile pile;
 
   @override

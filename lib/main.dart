@@ -36,6 +36,7 @@ class Quards extends StatelessWidget {
     cardColor: const Color(0xFF3F4950),
     scaffoldBackgroundColor: const Color(0xFF2D3439),
     primarySwatch: Colors.blue,
+    primaryColor: Colors.green,
   );
 
   @override
@@ -108,9 +109,7 @@ class _MainPageState extends State<MainPage>
   }
 
   double calculateScreenUnit() {
-    // Total width = 9 cardWidth + 13 gutterWidth + 64dp + 44dp
     final double screenWidth = MediaQuery.of(context).size.width;
-
     const double gutterScreenUnits = 2;
     const double cardWidthScreenUnits = 10;
     const totalScreenUnits = gutterScreenUnits * 13 + cardWidthScreenUnits * 9;
@@ -136,55 +135,55 @@ class _MainPageState extends State<MainPage>
                 alignment: Alignment.bottomLeft,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
-                          children: [
-                            Transform.rotate(
-                              angle: pi / 4,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context)
-                                      .hintColor
-                                      .withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                height: Theme.of(context)
-                                    .textTheme
-                                    .headline2!
-                                    .fontSize,
-                                width: Theme.of(context)
-                                    .textTheme
-                                    .headline2!
-                                    .fontSize,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: _buildAppTitle(),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          'Solitaire',
-                          style:
-                              Theme.of(context).textTheme.headline4?.copyWith(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Stack(
+                            children: [
+                              //左下角正方形
+                              Transform.rotate(
+                                angle: pi / 4,
+                                child: Container(
+                                  decoration: BoxDecoration(
                                     color: Theme.of(context)
-                                        .hintColor
-                                        .withOpacity(0.1),
+                                        .primaryColor
+                                        .withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
-                        ),
-                      ],
+                                  height: Theme.of(context)
+                                      .textTheme
+                                      .headline2!
+                                      .fontSize,
+                                  width: Theme.of(context)
+                                      .textTheme
+                                      .headline2!
+                                      .fontSize,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: _buildAppName(),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            'Solitaire',
+                            style:
+                            Theme.of(context).textTheme.headline4?.copyWith(
+                              color: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.6),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   Padding(
                     padding: EdgeInsets.only(top: gutterWidth),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      // mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
@@ -232,6 +231,7 @@ class _MainPageState extends State<MainPage>
                           ],
                         ),
                         SizedBox(width: gutterWidth),
+                        // 七个牌堆
                         for (SolitairePile pile in game.tableauPiles) ...{
                           _buildPile(pile, halfGutters: true),
                         },
@@ -250,8 +250,7 @@ class _MainPageState extends State<MainPage>
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            for (SolitairePile foundation
-                                in game.foundations) ...{
+                            for (SolitairePile foundation in game.foundations) ...{
                               _buildPile(foundation,
                                   verticalCardOffset: Offset.zero),
                               SizedBox(height: gutterWidth),
@@ -310,7 +309,7 @@ class _MainPageState extends State<MainPage>
   }
 
   //绘制左下角标志
-  Widget _buildAppTitle() {
+  Widget _buildAppName() {
     return Stack(
       children: [
         Text(
@@ -410,6 +409,7 @@ class _MainPageState extends State<MainPage>
   }
 
   Widget _buildCard(SolitaireCard card, SolitaireCardLocation location) {
+    //draggedLocation 为空说明就没有被拖拽
     final bool isDraggedByAnotherCard = draggedLocation != null
         ? location.pile == draggedLocation!.pile &&
             location.row >= draggedLocation!.row
@@ -690,6 +690,9 @@ class _MainPageState extends State<MainPage>
 
     game = SolitaireGame();
     game.won.addListener(onGameWinUpdate);
+    pileKeys = {
+      for (Pile pile in game.allPiles) pile: GlobalKey()
+    };
     winAnimationController.reverse();
   }
 
