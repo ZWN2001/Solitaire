@@ -454,13 +454,15 @@ class _MainPageState extends State<MainPage>
         onDragCancel: () {
           setState(() {
             draggedLocation = null;
-            // Add every card below this
+            //拖动时只会确定 draggedLocation ， 如果不执行下面的添加操作就会导致
+            // 在多张牌的拖动取消时，顶部的牌瞬间恢复原位，而只有底部的牌执行动画的问题
             location.pile.cards.skip(location.row + 1).forEach((card) {
               animatingCards.add(card);
             });
           });
         },
         onDragReturn: () {
+          //返回完成后从集合中删掉
           location.pile.cards.skip(location.row + 1).forEach((card) {
             animatingCards.remove(card);
           });

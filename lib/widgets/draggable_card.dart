@@ -8,7 +8,11 @@ import 'package:quards/main.dart';
 typedef ElevationWidgetBuilder = Widget Function(BuildContext context,
     Widget? child, double elevation, bool isDragged, double scale);
 
-// A card that is draggable and returns to its original spot
+/*
+ * @Date  4.1
+ * @Description 能拖动、能执行自动复位动画的卡片类
+ * @Since version-1.0
+ */
 
 class DraggableCard<T extends Object> extends StatefulWidget {
   const DraggableCard(
