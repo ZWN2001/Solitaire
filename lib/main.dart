@@ -59,8 +59,10 @@ class MainPage extends StatefulWidget {
 class HoverReleaseDetails {
   const HoverReleaseDetails(
       {required this.card, required this.acceptedPile, required this.offset});
+  //牌
   final StandardCard card;
   final Offset offset;
+  //接受前的牌堆
   final SolitairePile acceptedPile;
 }
 
@@ -673,8 +675,9 @@ class _MainPageState extends State<MainPage>
     releasedNotifier = ValueNotifier(null);
     hoveredPile = null;
     animatingCards = HashSet();
+    Map<Pile,GlobalKey> key = pileKeys;
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar( SnackBar(
       behavior: SnackBarBehavior.floating,
       width: 300,
       content: const Text('已开始新游戏'),
@@ -683,6 +686,7 @@ class _MainPageState extends State<MainPage>
         onPressed: () {
           setState(() {
             game = thisGame;
+            pileKeys = key;
           });
         },
       ),
