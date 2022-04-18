@@ -87,7 +87,7 @@ class _MainPageState extends State<MainPage>
   Offset get wasteCardOffset => const Offset(0, 0);
 
   late final AnimationController winAnimationController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 1000));
+      vsync: this, duration: const Duration(milliseconds: 2000));
   late final winFadeAnimation = CurvedAnimation(
       parent: winAnimationController,
       curve: const Interval(0, 0.5),
@@ -258,9 +258,8 @@ class _MainPageState extends State<MainPage>
                   ),
                 ],
               ),
-              IgnorePointer(
-                ignoring: !game.won.value,
-                child: FadeTransition(
+              if(game.won.value)
+                FadeTransition(
                   opacity: winFadeAnimation,
                   child: Container(
                     color: Colors.black.withOpacity(0.75),
@@ -296,7 +295,7 @@ class _MainPageState extends State<MainPage>
                     ),
                   ),
                 ),
-              ),
+
             ],
           ),
         ),
@@ -708,7 +707,6 @@ class _MainPageState extends State<MainPage>
 
   void undoPreviousMove() {
     setState(() {
-      print(game.moves.toString());
       Move move = game.previousMove!;
       if (move is PileMove) {
         animatePileMove(move.card, move.destination, move.origin);

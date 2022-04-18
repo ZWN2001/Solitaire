@@ -47,9 +47,6 @@ class SolitaireGame {
     ];
   }
 
-  // SolitairePile pileAt(int col) {
-  //   return tableauPiles[col];
-  // }
 
   SolitaireCard cardAt(SolitaireCardLocation location) {
     return location.pile.cardAt(location.row);
