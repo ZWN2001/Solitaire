@@ -9,8 +9,7 @@ abstract class Move {
 abstract class PileMove extends Move {
   PileMove(this.origin, this.targetPile)
       : oldtargetPileSize = targetPile.size,
-        destination =
-            SolitaireCardLocation(row: targetPile.size, pile: targetPile),
+        destination = SolitaireCardLocation(row: targetPile.size, pile: targetPile),
         card = origin.pile.cardAt(origin.row);
   final SolitaireCardLocation origin;
   final SolitaireCardLocation destination;
@@ -33,7 +32,7 @@ abstract class PileMove extends Move {
   }
 }
 
-/// Like a pile move, but from a tableau pile. Supports undoing of card flips.
+/// Like a pile move, 维护中间七个牌堆间的移动
 class TableauPileMove extends PileMove {
   SolitaireCard? flippedCard;
   TableauPileMove(SolitaireCardLocation origin, SolitairePile targetPile)
@@ -58,15 +57,15 @@ class TableauPileMove extends PileMove {
   }
 }
 
+///主要维护左侧预备牌堆的移动
 class StockPileMove extends PileMove {
+
   StockPileMove(this.stock)
       : super(
             SolitaireCardLocation(
                 row: stock.stockPile.size - 1, pile: stock.stockPile),
             stock.wastePile);
   SolitaireStock stock;
-  // final int dealtCardRow;
-
   @override
   void execute() {
     move(stock.stockPile, stock.wastePile);
@@ -86,14 +85,48 @@ class StockPileMove extends PileMove {
       } else {
         super.undo();
       }
-      // toPile.appendPile(topCardPile);
     } else {
-      // Stock pile is empty, return all from waste pile to stock pile
-      while (toPile.isNotEmpty) {
-        final SolitairePile topCardPile = toPile.removeTopCard();
-        topCardPile.topCard!.flip();
-        fromPile.appendPile(topCardPile);
-      }
+      // // Stock pile is empty, return all from waste pile to stock pile
+      // while (fromPile.isNotEmpty) {
+      //   final SolitairePile topCardPile = fromPile.removeTopCard();
+      //   topCardPile.topCard!.flip();
+      //   toPile.appendPile(topCardPile);
+      // }
     }
+  }
+@override
+  String toString() {
+  return 'StockPileMove{stock: $stock}';
+  }
+}
+
+///stock中没有牌了，将waste移回
+class StockPileMoveBack extends PileMove {
+  StockPileMoveBack(this.stock)
+      : super(SolitaireCardLocation(row: stock.wastePile.size - 1 , pile: stock.wastePile), stock.stockPile);
+  SolitaireStock stock;
+
+  @override
+  void execute() {}
+
+  @override
+  void undo() {}
+
+  void move(SolitairePile fromPile, SolitairePile toPile) {
+      // Stock pile is empty, return all from waste pile to stock pile
+      while (fromPile.isNotEmpty) {
+        final SolitairePile topCardPile = fromPile.removeTopCard();
+        topCardPile.topCard!.flip();
+        toPile.appendPile(topCardPile);
+      }
+  }
+
+  void moveBack(){
+      move(stock.wastePile, stock.stockPile);
+  }
+
+  @override
+  String toString() {
+    return 'StockPileMoveBack{stock: $stock}';
   }
 }

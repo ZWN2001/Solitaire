@@ -2,7 +2,8 @@ import 'package:quards/models/deck.dart';
 
 /*
  * @Date  3.29
- * @Description 纸牌实体类
+ * @Description 纸牌游戏的纸牌实体类
+ * 用于规范纸牌的正反朝向、翻面方法以及判断是否符合红黑牌相间的规则
  * @Since version-1.0
  */
 
@@ -31,7 +32,7 @@ class SolitaireCard {
 
   String get valueString => _card.valueString;
 
-  ///翻面方法
+  ///翻面
   void flip() {
     _faceDown = !_faceDown;
   }

@@ -72,7 +72,7 @@ class _MainPageState extends State<MainPage>
   SolitaireCardLocation? hoveredLocation;
   SolitaireCardLocation? draggedLocation;
   Map<StandardCard, SolitaireCardLocation?> releasedCardOrigin = {};
-  Map<StandardCard, SolitaireCardLocation?> releasedCardDestination = {};
+  // Map<StandardCard, SolitaireCardLocation?> releasedCardDestination = {};
   ValueNotifier<HoverReleaseDetails?> releasedNotifier = ValueNotifier(null);
   SolitairePile? hoveredPile;
   Set<SolitaireCard> animatingCards = HashSet();
@@ -205,19 +205,13 @@ class _MainPageState extends State<MainPage>
                               IconButton(
                                 tooltip: '撤销 (Ctrl-Z)',
                                 onPressed: game.canUndo()
-                                    ? () {
-                                        undoPreviousMove();
-                                      }
-                                    : null,
+                                    ? undoPreviousMove : null,
                                 icon: const Icon(Icons.undo),
                               ),
                               IconButton(
                                 tooltip: '重做 (Ctrl-Shift Z/Ctrl-Y)',
                                 onPressed: game.canRedo()
-                                    ? () {
-                                        redoPreviousMove();
-                                      }
-                                    : null,
+                                    ? redoPreviousMove : null,
                                 icon: const Icon(Icons.redo),
                               ),
                             ],
@@ -393,15 +387,15 @@ class _MainPageState extends State<MainPage>
                 return null;
               },
             ),
-            // DrawFromStockIntent: CallbackAction<DrawFromStockIntent>(
-            //     onInvoke: (DrawFromStockIntent intent) {
-            //   if (canUseShortcut) {
-            //     setState(() {
-            //       drawFromStockPile();
-            //     });
-            //   }
-            //   return null;
-            // }),
+            DrawFromStockIntent: CallbackAction<DrawFromStockIntent>(
+                onInvoke: (DrawFromStockIntent intent) {
+              if (canUseShortcut) {
+                setState(() {
+                  drawFromStockPile();
+                });
+              }
+              return null;
+            }),
           },
           child: Focus(
             autofocus: true,
@@ -473,11 +467,11 @@ class _MainPageState extends State<MainPage>
             animatingCards.remove(card);
           });
           final targetPile = hoveredPile!;
-          final acceptedPile = releasedCardDestination[card.standardCard]!.pile;
+          // final acceptedPile = releasedCardDestination[card.standardCard]!.pile;
           setState(() {
             releasedNotifier.value = HoverReleaseDetails(
               card: card.standardCard,
-              acceptedPile: acceptedPile,
+              acceptedPile: targetPile,
               offset: releasedOffset,
             );
             game.moveToPile(releasedCardOrigin[card.standardCard]!, targetPile);
@@ -550,7 +544,7 @@ class _MainPageState extends State<MainPage>
                       if(pile.size>0){
                         drawFromStockPile();
                       }else{
-
+                        _moveStockBack();
                       }
                     },
                   ),
@@ -563,13 +557,7 @@ class _MainPageState extends State<MainPage>
                   ),
                   if(pile.size == 0)
                     Center(
-                      child: IconButton(
-                        icon:const Icon(Icons.refresh),
-                        color: Theme.of(context).hintColor,
-                        onPressed: (){
-                          //TODO:重置
-                        },
-                      ),
+                      child:  Icon(Icons.refresh,color: Theme.of(context).hintColor),
                     ),
                 ],
               );
@@ -603,8 +591,8 @@ class _MainPageState extends State<MainPage>
       onAccept: (SolitaireCardLocation originalLocation) {
         final movedCard = game.cardAt(originalLocation);
         releasedCardOrigin[movedCard.standardCard] = originalLocation;
-        releasedCardDestination[movedCard.standardCard] =
-            SolitaireCardLocation(row: pile.size, pile: pile);
+        // releasedCardDestination[movedCard.standardCard] =
+        //     SolitaireCardLocation(row: pile.size, pile: pile);
       },
       builder: (context, List<SolitaireCardLocation?> locations,
               List<dynamic> rejectedData) =>
@@ -659,7 +647,7 @@ class _MainPageState extends State<MainPage>
       releasedNotifier.value = null;
       final Offset initialOffset = _getOffset(move.origin);
       releasedCardOrigin[move.card.standardCard] = move.origin;
-      releasedCardDestination[move.card.standardCard] = move.destination;
+      // releasedCardDestination[move.card.standardCard] = move.destination;
       final acceptedPile = move.destination.pile;
       releasedNotifier.value = HoverReleaseDetails(
           card: move.card.standardCard,
@@ -668,12 +656,28 @@ class _MainPageState extends State<MainPage>
     });
   }
 
+  void _moveStockBack(){
+    setState(() {
+    StockPileMoveBack move = game.backToStock();
+    game.moves.clear();//清空moves，因为该操作不可逆，这样可以保证逻辑上的正确
+    releasedNotifier.value = null;
+    final Offset initialOffset = _getOffset(move.origin);
+    releasedCardOrigin[move.card.standardCard] = move.origin;
+    // releasedCardDestination[move.card.standardCard] = move.destination;
+    final acceptedPile = move.destination.pile;
+    releasedNotifier.value = HoverReleaseDetails(
+        card: move.card.standardCard,
+        acceptedPile: acceptedPile,
+        offset: initialOffset);
+  });
+  }
+
   void startNewGame(BuildContext context) {
     final SolitaireGame thisGame = game;
     hoveredLocation = null;
     draggedLocation = null;
     releasedCardOrigin = {};
-    releasedCardDestination = {};
+    // releasedCardDestination = {};
     releasedNotifier = ValueNotifier(null);
     hoveredPile = null;
     animatingCards = HashSet();
@@ -704,6 +708,7 @@ class _MainPageState extends State<MainPage>
 
   void undoPreviousMove() {
     setState(() {
+      print(game.moves.toString());
       Move move = game.previousMove!;
       if (move is PileMove) {
         animatePileMove(move.card, move.destination, move.origin);
@@ -726,7 +731,7 @@ class _MainPageState extends State<MainPage>
       SolitaireCardLocation destination) {
     final Offset initialOffset = _getOffset(origin);
     releasedCardOrigin[card.standardCard] = destination;
-    releasedCardDestination[card.standardCard] = origin;
+    // releasedCardDestination[card.standardCard] = origin;
     final acceptedPile = origin.pile;
     releasedNotifier.value = HoverReleaseDetails(
       card: card.standardCard,

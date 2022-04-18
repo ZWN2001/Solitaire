@@ -85,6 +85,9 @@ const queen = 12;
 const king = 13;
 
 //Equatable可以自动覆写 ==和 hashCode
+/*
+ * @Description 纸牌基类，用于规定纸牌的花色与值
+ */
 class StandardCard extends Equatable {
   const StandardCard(this.suit, this.value)
       : assert(value >= ace),

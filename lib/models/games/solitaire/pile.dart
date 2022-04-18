@@ -8,6 +8,7 @@
 /*
  * @Date  3.29
  * @Description 纸牌堆类
+ * 维护一个盛放Card的列表
  * @Since version-1.0
  */
 

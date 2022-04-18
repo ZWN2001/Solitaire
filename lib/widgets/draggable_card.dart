@@ -66,15 +66,8 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
   final double maxRotationDegrees = 15;
   final double maxVelocity = 2500;
   double get maxRotation => maxRotationDegrees / 180 * pi;
-  // VelocityTracker tracker = VelocityTracker.withKind(PointerDeviceKind.unknown);
-  // final StreamController<Velocity> _velocityStreamController =
-  //     StreamController.broadcast();
 
   final GlobalKey _gestureDetectorKey = GlobalKey();
-
-  // late OverlayEntry cardOverlay = OverlayEntry(
-  //     builder: (context) =>
-  //         widget.builder(context, widget.child, elevation, false));
 
   late final AnimationController hoverAnimationController = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 250));
@@ -127,13 +120,7 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
           : true;
 
       if (shouldUpdate) {
-        // setState(() {
-        //   isDragging = true;
-        // });
         await springBackFrom(details.offset);
-        // setState(() {
-        //   isDragging = false;
-        // });
       }
     }
   }
@@ -148,7 +135,6 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
         : true;
     if (shouldUpdate) {
       releasedNotifierCallback();
-      // TODO: Update the card by animating it
     }
     releasedNotifierCallback();
     WidgetsBinding.instance!.scheduleFrameCallback((timeStamp) {
@@ -168,7 +154,6 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
   @override
   Widget build(BuildContext context) {
     if (widget.forceHovering != null) {
-      // If forced hovered state
       if (widget.forceHovering! != isHovering) {
         if (widget.forceHovering!) {
           hoverAnimationController.forward();
@@ -177,8 +162,6 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
         }
       }
     } else {
-      // Hovered state is not forced; animate to hover state
-      // based on cursor hover
       if (isHovering) {
         hoverAnimationController.forward();
       } else {
@@ -192,7 +175,6 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
         child: Listener(
           onPointerDown: (event) {
             isHovering = true;
-            // isHovering = widget.canHover;
           },
           onPointerUp: (event) {
             if (event.kind != PointerDeviceKind.mouse) isHovering = false;
@@ -213,25 +195,10 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
               key: _gestureDetectorKey,
               maxSimultaneousDrags: widget.canDrag ? null : 0,
               data: widget.data,
-              feedback:
-                  // _buildVelocityTransform(
-                  // child:
-                  Transform.scale(
+              feedback: Transform.scale(
                       scale: hoveredScale,
                       child: widget.builder(
                           context, widget.child, elevation, true, scale)),
-              // ),
-              // onDragUpdate: (details) {
-              // if (details.sourceTimeStamp != null) {
-              //   final previousVelocity = tracker.getVelocity();
-              //   tracker.addPosition(
-              //       details.sourceTimeStamp!, details.globalPosition);
-              //   final velocity = Velocity(
-              //       pixelsPerSecond: previousVelocity.pixelsPerSecond * 0.9 +
-              //           tracker.getVelocity().pixelsPerSecond);
-              //   _velocityStreamController.add(velocity);
-              // }
-              // },
               onDragStarted: () {
                 isHovering = true;
                 if (widget.onDragStart != null) widget.onDragStart!();
@@ -242,14 +209,10 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
                     widget.onDragAccept!(details.offset);
                   }
                 }
-                // isHovering = false;
               },
               onDraggableCanceled: (velocity, offset) {
                 if (widget.onDragCancel != null) widget.onDragCancel!();
                 springBackFrom(offset);
-                // setState(() {
-                //   isDragging = false;
-                // });
               },
               childWhenDragging: Opacity(
                 opacity: 0,
@@ -280,41 +243,6 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
       ),
     );
   }
-
-  // StreamBuilder<Velocity> _buildVelocityTransform({required Widget? child}) {
-  //   return StreamBuilder<Velocity>(
-  //     stream: _velocityStreamController.stream,
-  //     builder: (context, snapshot) {
-  //       final velocity = snapshot.data;
-
-  //       final double dxPercentage =
-  //           (-(velocity?.pixelsPerSecond.dx ?? 0) / maxVelocity).clamp(-1, 1);
-  //       final double dyPercentage =
-  //           ((velocity?.pixelsPerSecond.dy ?? 0) / maxVelocity).clamp(-1, 1);
-
-  //       final xRotation = Curves.easeOut.transform(dxPercentage.abs()) *
-  //           maxRotation *
-  //           dxPercentage.sign;
-
-  //       final yRotation = Curves.easeOut.transform(dyPercentage.abs()) *
-  //           maxRotation *
-  //           dyPercentage.sign;
-
-  //       return Transform.scale(
-  //         scale: scale,
-  //         alignment: Alignment.center,
-  //         child: Transform(
-  //           transform: Matrix4.identity()
-  //             ..setEntry(3, 2, 0.001)
-  //             ..rotateX(yRotation)
-  //             ..rotateY(xRotation),
-  //           alignment: FractionalOffset.center,
-  //           child: child,
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Future<void> springBackFrom(Offset offset) async {
     if (_gestureDetectorKey.currentContext?.findRenderObject() == null) {

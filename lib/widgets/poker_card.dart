@@ -1,8 +1,14 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
-import 'package:quards/models/games/solitaire/card.dart';
-import 'package:quards/models/deck.dart';
 
+import 'package:flutter/material.dart';
+import 'package:quards/models/deck.dart';
+import 'package:quards/models/games/solitaire/card.dart';
+
+/*
+ * @Description
+ * 扑克牌类，处理点击事件（背面朝上时）、宽高、阴影
+ * @Since version-1.0
+ */
 class PokerCard extends StatelessWidget {
   PokerCard(
       {Key? key,
@@ -30,7 +36,6 @@ class PokerCard extends StatelessWidget {
 
   final double elevation;
   final SolitaireCard? card;
-  // late final Color cardColor;
   final double width;
   final bool isFaceDown;
   final bool isTransparent;
@@ -41,8 +46,6 @@ class PokerCard extends StatelessWidget {
     return AnimatedSwitcher(
       switchInCurve: Curves.easeInOut,
       switchOutCurve: Curves.easeInOut,
-      // switchInCurve: Interval(0.5, 1),
-      // switchOutCurve: Interval(0, 0.5),
       duration: const Duration(milliseconds: 500),
       transitionBuilder: (child, animation) {
         return AnimatedBuilder(
@@ -85,13 +88,12 @@ class PokerCard extends StatelessWidget {
                 border: Border.all(
                     color: Theme.of(context).dividerColor, width: 4.0),
               ),
-              // padding: const EdgeInsets.all(16.0),
               width: 300,
               height: 500,
               child: Stack(
                 children: [
                   if (card != null) ...{
-                    if (!card!.isFaceDown) ...{
+                    if (!card!.isFaceDown) ...{ //正面朝上
                       _buildCardFront(context),
                     } else ...{
                       _buildCardBack(context),

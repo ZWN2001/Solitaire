@@ -5,16 +5,30 @@ import '../../deck.dart';
 import 'card.dart';
 import 'moves.dart';
 import 'pile.dart';
-
+// typedef StandardPile = Pile<StandardCard>;
+typedef SolitairePile = Pile<SolitaireCard>;
 class SolitaireGame {
+
+  static const int _pileCount = 7;
+  static const int _foundationCount = 4;
+
+  late final SolitaireStock stock;
+  late final List<SolitairePile> tableauPiles;
+  late final List<SolitairePile> drawablePiles;
+  late final List<SolitairePile> allPiles;
+  late final List<SolitairePile> foundations;
+  late final List<Move> moves;
+  late final List<Move> undoneMoves;
+  final ValueNotifier<bool> won = ValueNotifier(false);
+
   SolitaireGame() {
     final StandardDeck deck = StandardDeck.shuffled();
     tableauPiles = List.generate(
         _pileCount,
-        (index) => SolitairePile(deck
+            (index) => SolitairePile(deck
             .takeN(index + 1)
             .map((card) =>
-                SolitaireCard.fromStandardCard(card, isFaceDown: true))
+            SolitaireCard.fromStandardCard(card, isFaceDown: true))
             .toList()));
     for (SolitairePile pile in tableauPiles) {
       pile.topCard!.flip();
@@ -33,30 +47,27 @@ class SolitaireGame {
     ];
   }
 
-  static const int _pileCount = 7;
-  static const int _foundationCount = 4;
-
-  late final SolitaireStock stock;
-  late final List<SolitairePile> tableauPiles;
-  late final List<SolitairePile> drawablePiles;
-  late final List<SolitairePile> allPiles;
-  late final List<SolitairePile> foundations;
-  late final List<Move> moves;
-  late final List<Move> undoneMoves;
-  final ValueNotifier<bool> won = ValueNotifier(false);
-
-  SolitairePile pileAt(int col) {
-    return tableauPiles[col];
-  }
+  // SolitairePile pileAt(int col) {
+  //   return tableauPiles[col];
+  // }
 
   SolitaireCard cardAt(SolitaireCardLocation location) {
     return location.pile.cardAt(location.row);
   }
 
+  //从stock中取一张牌
   StockPileMove drawFromStock() {
     undoneMoves.clear();
     StockPileMove move = StockPileMove(stock);
     move.execute();
+    moves.add(move);
+    return move;
+  }
+
+  StockPileMoveBack backToStock() {
+    undoneMoves.clear();
+    StockPileMoveBack move = StockPileMoveBack(stock);
+    move.moveBack();
     moves.add(move);
     return move;
   }
@@ -99,14 +110,14 @@ class SolitaireGame {
     if (isSamePile) return false;
 
     bool isFoundation = isFoundationPile(targetPile);
-    if (isFoundation) {
+    if (isFoundation) {//最右面的四个牌堆
       bool isTopCard = location.row == location.pile.size - 1;
       if (!isTopCard) {
         return false;
       }
 
       SolitaireCard card = cardAt(location);
-      if (targetPile.isEmpty) {
+      if (targetPile.isEmpty) {//牌堆为空，只能为A
         return card.value == ace;
       } else {
         final SolitaireCard topCard = targetPile.topCard!;
@@ -116,25 +127,19 @@ class SolitaireGame {
     }
     SolitaireCard? targetCard = targetPile.topCard;
     if (targetCard != null) {
-      return movedCard.value == targetCard.value - 1 &&
-          targetCard.isRed != movedCard.isRed;
+      //值相差一，花色不同
+      return movedCard.value == targetCard.value - 1 &&targetCard.canBePlacedBelow(movedCard);
+          // targetCard.isRed != movedCard.isRed;
     } else {
       return movedCard.value == king;
     }
-    // return true;
   }
 
-  bool isFoundationPile(SolitairePile pile) {
-    return foundations.contains(pile);
-  }
+  bool isFoundationPile(SolitairePile pile) {return foundations.contains(pile);}
 
-  bool isWastePile(SolitairePile pile) {
-    return stock.wastePile == pile;
-  }
+  bool isWastePile(SolitairePile pile) {return stock.wastePile == pile;}
 
-  bool isStockPile(SolitairePile pile) {
-    return stock.stockPile == pile;
-  }
+  bool isStockPile(SolitairePile pile) {return stock.stockPile == pile;}
 
   bool canDrag(SolitaireCardLocation location) {
     bool isFaceDown = cardAt(location).isFaceDown;
@@ -189,13 +194,6 @@ class SolitaireGame {
             foundations.firstWhere((foundation) => foundation.isEmpty));
   }
 
-  bool _moveAutomaticallyToFoundation() {
-    final SolitaireCard? moveableCard = _getAutoMoveableCard();
-    if (moveableCard == null) return false;
-    _moveToFoundation(moveableCard);
-    return true;
-  }
-
   void _moveToFoundation(SolitaireCard card) {
     SolitairePile foundation = _getFoundationFor(card.suit);
     moveToPile(_getLocation(card), foundation);
@@ -213,6 +211,14 @@ class SolitaireGame {
     return card.value == (foundation.topCard?.value ?? 0) + 1;
   }
 
+  bool _moveAutomaticallyToFoundation() {
+    final SolitaireCard? moveableCard = _getAutoMoveableCard();
+    if (moveableCard == null) return false;
+    _moveToFoundation(moveableCard);
+    return true;
+  }
+
+  ///获取一张可以移动的卡片
   SolitaireCard? _getAutoMoveableCard() {
     final SolitaireCard? moveableCard = drawablePiles
         .map((pile) => pile.topCard)
@@ -232,6 +238,11 @@ class SolitaireStock {
             .toList());
   final SolitairePile stockPile;
   final SolitairePile wastePile = SolitairePile(List.empty(growable: true));
+
+  @override
+  String toString() {
+    return 'SolitaireStock{stockPile: $stockPile, wastePile: $wastePile}';
+  }
 }
 
 class SolitaireCardLocation extends Equatable {
@@ -252,6 +263,3 @@ class SolitaireCardLocation extends Equatable {
   @override
   List<Object?> get props => [row, pile];
 }
-
-typedef StandardPile = Pile<StandardCard>;
-typedef SolitairePile = Pile<SolitaireCard>;

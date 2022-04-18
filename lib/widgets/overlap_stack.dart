@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/*
+ * @Description 七个牌堆以及左面的翻开的牌堆
+ * @Since version-1.0
+ */
+
 class OverlapStack extends StatelessWidget {
   OverlapStack(
       {Key? key,
@@ -8,6 +13,7 @@ class OverlapStack extends StatelessWidget {
       : itemCount = children.length,
         itemBuilder = ((context, index) => children[index]),
         super(key: key);
+
   const OverlapStack.builder(
       {Key? key,
       required this.itemBuilder,
@@ -27,7 +33,6 @@ class OverlapStack extends StatelessWidget {
     List<Widget> _childrenSortedByZIndex = List.from(children)
       ..sort((child, otherChild) => child.zIndex.compareTo(otherChild.zIndex));
     return Stack(
-      // fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
         for (Widget child in _childrenSortedByZIndex) ...{
@@ -44,6 +49,11 @@ class OverlapStack extends StatelessWidget {
   }
 }
 
+/*
+ * @Description 牌堆中的每一个item
+ * @Since version-1.0
+ */
+
 class OverlapStackItem extends StatelessWidget {
   const OverlapStackItem({
     Key? key,
@@ -56,7 +66,6 @@ class OverlapStackItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // assert(context.findAncestorWidgetOfExactType<OverlapStack>() != null);
     return child;
   }
 }
