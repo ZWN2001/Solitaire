@@ -1,5 +1,3 @@
-library cards;
-
 import 'package:equatable/equatable.dart';
 
 //牌组抽象类（52张牌）

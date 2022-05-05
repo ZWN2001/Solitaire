@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quards/models/deck.dart';
-import 'package:quards/models/games/solitaire/card.dart';
-import 'package:quards/models/games/solitaire/moves.dart';
-import 'package:quards/models/games/solitaire/solitaire.dart';
+import 'package:quards/models/games/bean/card.dart';
+import 'package:quards/models/games/bean/moves.dart';
+import 'package:quards/models/games/bean/solitaire.dart';
 import 'package:quards/models/shortcuts/intents.dart';
 
-import 'models/games/solitaire/pile.dart';
+import 'models/games/bean/pile.dart';
 import 'widgets/draggable_card.dart';
 import 'widgets/overlap_stack.dart';
 import 'widgets/poker_card.dart';

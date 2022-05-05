@@ -8,13 +8,13 @@ abstract class Move {
 
 abstract class PileMove extends Move {
   PileMove(this.origin, this.targetPile)
-      : oldtargetPileSize = targetPile.size,
+      : oldTargetPileSize = targetPile.size,
         destination = SolitaireCardLocation(row: targetPile.size, pile: targetPile),
         card = origin.pile.cardAt(origin.row);
   final SolitaireCardLocation origin;
   final SolitaireCardLocation destination;
   final SolitairePile targetPile;
-  final int oldtargetPileSize;
+  final int oldTargetPileSize;
   final SolitaireCard card;
 
   @override
@@ -26,7 +26,7 @@ abstract class PileMove extends Move {
 
   @override
   void undo() {
-    SolitairePile movedPile = targetPile.removePileFrom(oldtargetPileSize);
+    SolitairePile movedPile = targetPile.removePileFrom(oldTargetPileSize);
     SolitairePile originPile = origin.pile;
     originPile.appendPile(movedPile);
   }
