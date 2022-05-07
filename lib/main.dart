@@ -1,31 +1,56 @@
 import 'dart:collection';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:quards/models/deck.dart';
-import 'package:quards/models/games/bean/card.dart';
-import 'package:quards/models/games/bean/moves.dart';
-import 'package:quards/models/games/bean/solitaire.dart';
+import 'package:quards/models/bean/card.dart';
+import 'package:quards/models/bean/deck.dart';
+import 'package:quards/models/bean/moves.dart';
+import 'package:quards/models/bean/solitaire.dart';
 import 'package:quards/models/shortcuts/intents.dart';
 
-import 'models/games/bean/pile.dart';
+import 'models/bean/pile.dart';
 import 'widgets/draggable_card.dart';
 import 'widgets/overlap_stack.dart';
 import 'widgets/poker_card.dart';
 
 void main() {
-  runApp(Quards());
-  doWhenWindowReady(() {
-    appWindow.title = "Quards Solitaire";
-    const initialSize = Size(1200, 700);
-    appWindow.minSize = initialSize;
-    appWindow.size = initialSize;
-    appWindow.alignment = Alignment.center;
-    appWindow.show();
-  });
+  try{
+    if(Platform.isAndroid ||Platform.isIOS){
+      WidgetsFlutterBinding.ensureInitialized();
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]).then((_){
+        runApp(Quards());
+      });
+    }else{
+      runApp(Quards());
+      doWhenWindowReady(() {
+        appWindow.title = "Quards Solitaire";
+        const initialSize = Size(1200, 700);
+        appWindow.minSize = initialSize;
+        appWindow.size = initialSize;
+        appWindow.alignment = Alignment.center;
+        appWindow.show();
+      });
+    }
+  }catch(e){
+    //通常web会报这个错
+    if(e.toString() == 'Unsupported operation: Platform._operatingSystem'){
+      runApp(Quards());
+      doWhenWindowReady(() {
+        appWindow.title = "Quards Solitaire";
+        const initialSize = Size(1200, 700);
+        appWindow.minSize = initialSize;
+        appWindow.size = initialSize;
+        appWindow.alignment = Alignment.center;
+        appWindow.show();
+      });
+    }
+  }
+
 }
 
 class Quards extends StatelessWidget {

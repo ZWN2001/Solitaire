@@ -1,4 +1,4 @@
-import 'package:quards/models/deck.dart';
+import 'package:quards/models/bean/deck.dart';
 
 /*
  * @Date  3.29

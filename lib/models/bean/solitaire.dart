@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../deck.dart';
 import 'card.dart';
+import 'deck.dart';
 import 'moves.dart';
 import 'pile.dart';
 // typedef StandardPile = Pile<StandardCard>;

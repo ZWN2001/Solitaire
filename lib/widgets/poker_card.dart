@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:quards/models/deck.dart';
-import 'package:quards/models/games/bean/card.dart';
+import 'package:quards/models/bean/card.dart';
+import 'package:quards/models/bean/deck.dart';
 
 /*
  * @Description
