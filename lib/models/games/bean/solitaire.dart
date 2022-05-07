@@ -30,9 +30,11 @@ class SolitaireGame {
             .map((card) =>
             SolitaireCard.fromStandardCard(card, isFaceDown: true))
             .toList()));
+    //将七个牌堆的第一张牌翻转
     for (SolitairePile pile in tableauPiles) {
       pile.topCard!.flip();
     }
+    //deck剩下的就是stock
     stock = SolitaireStock(deck);
     foundations = List.generate(
         _foundationCount, (index) => SolitairePile(List.empty(growable: true)));

@@ -604,6 +604,7 @@ class _MainPageState extends State<MainPage>
         child: Stack(
           clipBehavior: Clip.none,
           children: [
+            //没有一个EmptyCard会报错
             _buildEmptyCard(),
             if (pile.isNotEmpty)
               OverlapStack.builder(
@@ -614,6 +615,7 @@ class _MainPageState extends State<MainPage>
                 itemCount: pile.size,
                 childrenOffset: verticalCardOffset,
               ),
+            //可以放置时出现的提示区域（有几张就出现几个提示区域）
             if (locations.isNotEmpty)
               Transform.translate(
                 offset: verticalCardOffset * pile.size.toDouble(),

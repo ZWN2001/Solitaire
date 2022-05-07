@@ -1,0 +1,392 @@
+@startuml
+set namespaceSeparator ::
+
+class "quards::main.dart::Quards" {
+  +ThemeData data
+  +Widget build()
+}
+
+"quards::main.dart::Quards" o-- "flutter::src::material::theme_data.dart::ThemeData"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "quards::main.dart::Quards"
+
+class "quards::main.dart::MainPage" {
+  +_MainPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "quards::main.dart::MainPage"
+
+class "quards::main.dart::HoverReleaseDetails" {
+  +StandardCard card
+  +Offset offset
+  +Pile<SolitaireCard> acceptedPile
+}
+
+"quards::main.dart::HoverReleaseDetails" o-- "quards::models::deck.dart::StandardCard"
+"quards::main.dart::HoverReleaseDetails" o-- "dart::ui::Offset"
+"quards::main.dart::HoverReleaseDetails" o-- "quards::models::games::solitaire::pile.dart::Pile<SolitaireCard>"
+
+class "quards::main.dart::_MainPageState" {
+  +SolitaireGame game
+  +SolitaireCardLocation? hoveredLocation
+  +SolitaireCardLocation? draggedLocation
+  +Map<StandardCard, SolitaireCardLocation?> releasedCardOrigin
+  +ValueNotifier<HoverReleaseDetails?> releasedNotifier
+  +Pile<SolitaireCard>? hoveredPile
+  +Set<SolitaireCard> animatingCards
+  +Map<Pile<dynamic>, GlobalKey<State<StatefulWidget>>> pileKeys
+  +AnimationController winAnimationController
+  +CurvedAnimation winFadeAnimation
+  +CurvedAnimation winTextAnimation
+  +double screenUnit
+  +double gutterWidth
+  +double cardWidth
+  +Offset tableauCardOffset
+  +Offset wasteCardOffset
+  +void initState()
+  +void onGameWinUpdate()
+  +double calculateScreenUnit()
+  +Widget build()
+  -Widget _buildAppName()
+  -Widget _buildShortcuts()
+  -Widget _buildCard()
+  -Widget _buildStockPile()
+  -Widget _buildPile()
+  -Widget _buildEmptyCard()
+  -Widget _buildCardOutline()
+  +void drawFromStockPile()
+  -void _moveStockBack()
+  +void startNewGame()
+  +void undoPreviousMove()
+  +void redoPreviousMove()
+  +void animatePileMove()
+  -Offset _getOffset()
+  +void tryMoveToFoundation()
+}
+
+"quards::main.dart::_MainPageState" o-- "quards::models::games::solitaire::solitaire.dart::SolitaireGame"
+"quards::main.dart::_MainPageState" o-- "quards::models::games::solitaire::solitaire.dart::SolitaireCardLocation"
+"quards::main.dart::_MainPageState" o-- "flutter::src::foundation::change_notifier.dart::ValueNotifier<HoverReleaseDetails>"
+"quards::main.dart::_MainPageState" o-- "quards::models::games::solitaire::pile.dart::Pile<SolitaireCard>"
+"quards::main.dart::_MainPageState" o-- "flutter::src::animation::animation_controller.dart::AnimationController"
+"quards::main.dart::_MainPageState" o-- "flutter::src::animation::animations.dart::CurvedAnimation"
+"quards::main.dart::_MainPageState" o-- "dart::ui::Offset"
+"flutter::src::widgets::framework.dart::State" <|-- "quards::main.dart::_MainPageState"
+"flutter::src::widgets::ticker_provider.dart::SingleTickerProviderStateMixin" <|-- "quards::main.dart::_MainPageState"
+
+abstract class "quards::models::deck.dart::Deck" {
+  +List<Card> cards
+  -int _size
+  +int size
+  +bool isEmpty
+  +bool isNotEmpty
+  +Card peek()
+  +Iterable<Card> peekN()
+  +Card cardAt()
+  +Card take()
+  +Iterable<Card> takeN()
+  +void shuffle()
+}
+
+class "quards::models::deck.dart::StandardDeck" {
+}
+
+"quards::models::deck.dart::Deck" <|-- "quards::models::deck.dart::StandardDeck"
+
+class "quards::models::deck.dart::StandardCard" {
+  +Suit suit
+  +int value
+  +bool isRed
+  +String valueString
+  +List<Object?> props
+  +String toString()
+}
+
+"quards::models::deck.dart::StandardCard" o-- "quards::models::deck.dart::Suit"
+"equatable::src::equatable.dart::Equatable" <|-- "quards::models::deck.dart::StandardCard"
+
+class "quards::models::deck.dart::Suit" {
+  +int index
+  {static} +List<Suit> values
+  {static} +Suit clubs
+  {static} +Suit diamonds
+  {static} +Suit hearts
+  {static} +Suit spades
+}
+
+"quards::models::deck.dart::Suit" o-- "quards::models::deck.dart::Suit"
+"dart::core::Enum" <|-- "quards::models::deck.dart::Suit"
+
+class "quards::models::games::solitaire::card.dart::SolitaireCard" {
+  -StandardCard _card
+  -bool _faceDown
+  +StandardCard standardCard
+  +Suit suit
+  +int value
+  +bool isRed
+  +bool isFaceDown
+  +String valueString
+  +void flip()
+  +bool canBePlacedBelow()
+  +String toString()
+}
+
+"quards::models::games::solitaire::card.dart::SolitaireCard" o-- "quards::models::deck.dart::StandardCard"
+"quards::models::games::solitaire::card.dart::SolitaireCard" o-- "quards::models::deck.dart::Suit"
+
+abstract class "quards::models::games::solitaire::moves.dart::Move" {
+  +void execute()
+  +void undo()
+}
+
+abstract class "quards::models::games::solitaire::moves.dart::PileMove" {
+  +SolitaireCardLocation origin
+  +SolitaireCardLocation destination
+  +Pile<SolitaireCard> targetPile
+  +int oldtargetPileSize
+  +SolitaireCard card
+  +void execute()
+  +void undo()
+}
+
+"quards::models::games::solitaire::moves.dart::PileMove" o-- "quards::models::games::solitaire::solitaire.dart::SolitaireCardLocation"
+"quards::models::games::solitaire::moves.dart::PileMove" o-- "quards::models::games::solitaire::pile.dart::Pile<SolitaireCard>"
+"quards::models::games::solitaire::moves.dart::PileMove" o-- "quards::models::games::solitaire::card.dart::SolitaireCard"
+"quards::models::games::solitaire::moves.dart::Move" <|-- "quards::models::games::solitaire::moves.dart::PileMove"
+
+class "quards::models::games::solitaire::moves.dart::TableauPileMove" {
+  +SolitaireCard? flippedCard
+  +void execute()
+  +void undo()
+}
+
+"quards::models::games::solitaire::moves.dart::TableauPileMove" o-- "quards::models::games::solitaire::card.dart::SolitaireCard"
+"quards::models::games::solitaire::moves.dart::PileMove" <|-- "quards::models::games::solitaire::moves.dart::TableauPileMove"
+
+class "quards::models::games::solitaire::moves.dart::StockPileMove" {
+  +SolitaireStock stock
+  +void execute()
+  +void undo()
+  +void move()
+  +String toString()
+}
+
+"quards::models::games::solitaire::moves.dart::StockPileMove" o-- "quards::models::games::solitaire::solitaire.dart::SolitaireStock"
+"quards::models::games::solitaire::moves.dart::PileMove" <|-- "quards::models::games::solitaire::moves.dart::StockPileMove"
+
+class "quards::models::games::solitaire::moves.dart::StockPileMoveBack" {
+  +SolitaireStock stock
+  +void execute()
+  +void undo()
+  +void move()
+  +void moveBack()
+  +String toString()
+}
+
+"quards::models::games::solitaire::moves.dart::StockPileMoveBack" o-- "quards::models::games::solitaire::solitaire.dart::SolitaireStock"
+"quards::models::games::solitaire::moves.dart::PileMove" <|-- "quards::models::games::solitaire::moves.dart::StockPileMoveBack"
+
+class "quards::models::games::solitaire::pile.dart::Pile" {
+  -List<Card> _cards
+  +Iterable<Card> cards
+  +int size
+  +Card? topCard
+  +Card? bottomCard
+  +bool isEmpty
+  +bool isNotEmpty
+  +Card cardAt()
+  +int rowOf()
+  +Pile<Card> removePileFrom()
+  +Pile<Card> removeTopCard()
+  +Pile<Card> peekTopCard()
+  +Pile<Card> peekPileFrom()
+  +void appendPile()
+  +String toString()
+}
+
+class "quards::models::games::solitaire::solitaire.dart::SolitaireGame" {
+  {static} -int _pileCount
+  {static} -int _foundationCount
+  +SolitaireStock stock
+  +List<Pile<SolitaireCard>> tableauPiles
+  +List<Pile<SolitaireCard>> drawablePiles
+  +List<Pile<SolitaireCard>> allPiles
+  +List<Pile<SolitaireCard>> foundations
+  +List<Move> moves
+  +List<Move> undoneMoves
+  +ValueNotifier<bool> won
+  +Move? previousMove
+  +Move? previousUndoneMove
+  +SolitaireCard cardAt()
+  +StockPileMove drawFromStock()
+  +StockPileMoveBack backToStock()
+  +PileMove moveToPile()
+  -void _win()
+  +void makeAllPossibleFoundationMoves()
+  +bool canAutoMove()
+  +bool canMoveToPile()
+  +bool isFoundationPile()
+  +bool isWastePile()
+  +bool isStockPile()
+  +bool canDrag()
+  +Move undo()
+  +bool canUndo()
+  +Move redo()
+  +bool canRedo()
+  -SolitaireCardLocation _getLocation()
+  -Pile<SolitaireCard> _getFoundationFor()
+  -void _moveToFoundation()
+  +PileMove? tryMoveToFoundation()
+  -bool _canMoveToFoundation()
+  -bool _moveAutomaticallyToFoundation()
+  -SolitaireCard? _getAutoMoveableCard()
+}
+
+"quards::models::games::solitaire::solitaire.dart::SolitaireGame" o-- "quards::models::games::solitaire::solitaire.dart::SolitaireStock"
+"quards::models::games::solitaire::solitaire.dart::SolitaireGame" o-- "flutter::src::foundation::change_notifier.dart::ValueNotifier<bool>"
+"quards::models::games::solitaire::solitaire.dart::SolitaireGame" o-- "quards::models::games::solitaire::moves.dart::Move"
+
+class "quards::models::games::solitaire::solitaire.dart::SolitaireStock" {
+  +Pile<SolitaireCard> stockPile
+  +Pile<SolitaireCard> wastePile
+  +String toString()
+}
+
+"quards::models::games::solitaire::solitaire.dart::SolitaireStock" o-- "quards::models::games::solitaire::pile.dart::Pile<SolitaireCard>"
+
+class "quards::models::games::solitaire::solitaire.dart::SolitaireCardLocation" {
+  +int row
+  +Pile<SolitaireCard> pile
+  +List<Object?> props
+  +String toString()
+}
+
+"quards::models::games::solitaire::solitaire.dart::SolitaireCardLocation" o-- "quards::models::games::solitaire::pile.dart::Pile<SolitaireCard>"
+"equatable::src::equatable.dart::Equatable" <|-- "quards::models::games::solitaire::solitaire.dart::SolitaireCardLocation"
+
+class "quards::models::shortcuts::intents.dart::UndoIntent" {
+}
+
+"flutter::src::widgets::actions.dart::Intent" <|-- "quards::models::shortcuts::intents.dart::UndoIntent"
+
+class "quards::models::shortcuts::intents.dart::RedoIntent" {
+}
+
+"flutter::src::widgets::actions.dart::Intent" <|-- "quards::models::shortcuts::intents.dart::RedoIntent"
+
+class "quards::models::shortcuts::intents.dart::NewGameIntent" {
+}
+
+"flutter::src::widgets::actions.dart::Intent" <|-- "quards::models::shortcuts::intents.dart::NewGameIntent"
+
+class "quards::models::shortcuts::intents.dart::MoveCardsToFoundationIntent" {
+}
+
+"flutter::src::widgets::actions.dart::Intent" <|-- "quards::models::shortcuts::intents.dart::MoveCardsToFoundationIntent"
+
+class "quards::models::shortcuts::intents.dart::DrawFromStockIntent" {
+}
+
+"flutter::src::widgets::actions.dart::Intent" <|-- "quards::models::shortcuts::intents.dart::DrawFromStockIntent"
+
+class "quards::widgets::draggable_card.dart::DraggableCard" {
+  +Widget? child
+  +double hoverElevation
+  +double elevation
+  +Widget Function(BuildContext, Widget?, double, bool, double) builder
+  +void Function(bool)? onHover
+  +void Function()? onDragStart
+  +void Function()? onDragCancel
+  +void Function(Offset)? onDragAccept
+  +void Function()? onDragReturn
+  +void Function()? onDoubleTap
+  +T? data
+  +bool? forceHovering
+  +bool canDrag
+  +bool canHover
+  +ValueNotifier<HoverReleaseDetails?>? releasedNotifier
+  +bool Function(HoverReleaseDetails?)? shouldUpdateOnRelease
+  {static} +Widget defaultBuilder()
+  +_DraggableCardState<Object> createState()
+}
+
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "flutter::src::widgets::framework.dart::Widget"
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "quards::widgets::draggable_card.dart::Widget Function(BuildContext, Widget, double, bool, double)"
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "flutter::src::foundation::basic_types.dart::void Function(bool)"
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "dart::ui::void Function()"
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "flutter::src::foundation::basic_types.dart::void Function(Offset)"
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "flutter::src::foundation::change_notifier.dart::ValueNotifier<HoverReleaseDetails>"
+"quards::widgets::draggable_card.dart::DraggableCard" o-- "null::bool Function(HoverReleaseDetails)"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "quards::widgets::draggable_card.dart::DraggableCard"
+
+class "quards::widgets::draggable_card.dart::_DraggableCardState" {
+  +double maxRotationDegrees
+  +double maxVelocity
+  -GlobalKey<State<StatefulWidget>> _gestureDetectorKey
+  +AnimationController hoverAnimationController
+  +Animation<dynamic> hoverAnimation
+  +AnimationController offsetAnimationController
+  +Animation<dynamic> offsetAnimation
+  +Offset draggableReleasedOffset
+  +double hoveredScale
+  +bool isDragging
+  -bool _isHovering
+  +bool hasUpdated
+  +double maxRotation
+  +double hoverPercentage
+  +double elevation
+  +double scale
+  +bool isHovering
+  +void releasedNotifierCallback()
+  +void initState()
+  +void dispose()
+  +Widget build()
+  +Future<void> springBackFrom()
+}
+
+"quards::widgets::draggable_card.dart::_DraggableCardState" o-- "flutter::src::widgets::framework.dart::GlobalKey<State<StatefulWidget>>"
+"quards::widgets::draggable_card.dart::_DraggableCardState" o-- "flutter::src::animation::animation_controller.dart::AnimationController"
+"quards::widgets::draggable_card.dart::_DraggableCardState" o-- "flutter::src::animation::animation.dart::Animation<dynamic>"
+"quards::widgets::draggable_card.dart::_DraggableCardState" o-- "dart::ui::Offset"
+"flutter::src::widgets::framework.dart::State" <|-- "quards::widgets::draggable_card.dart::_DraggableCardState"
+"flutter::src::widgets::ticker_provider.dart::TickerProviderStateMixin" <|-- "quards::widgets::draggable_card.dart::_DraggableCardState"
+
+class "quards::widgets::overlap_stack.dart::OverlapStack" {
+  {static} -Offset _defaultOffset
+  +Offset childrenOffset
+  +Widget Function(BuildContext, int) itemBuilder
+  +int itemCount
+  +Widget build()
+}
+
+"quards::widgets::overlap_stack.dart::OverlapStack" o-- "dart::ui::Offset"
+"quards::widgets::overlap_stack.dart::OverlapStack" o-- "flutter::src::widgets::framework.dart::Widget Function(BuildContext, int)"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "quards::widgets::overlap_stack.dart::OverlapStack"
+
+class "quards::widgets::overlap_stack.dart::OverlapStackItem" {
+  +Widget child
+  +int zIndex
+  +Widget build()
+}
+
+"quards::widgets::overlap_stack.dart::OverlapStackItem" o-- "flutter::src::widgets::framework.dart::Widget"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "quards::widgets::overlap_stack.dart::OverlapStackItem"
+
+class "quards::widgets::poker_card.dart::PokerCard" {
+  +double elevation
+  +SolitaireCard? card
+  +double width
+  +bool isFaceDown
+  +bool isTransparent
+  +void Function()? onTap
+  +Widget build()
+  -Widget _buildCornerText()
+  -Widget _buildCardFront()
+  -Widget _buildCardBack()
+}
+
+"quards::widgets::poker_card.dart::PokerCard" o-- "quards::models::games::solitaire::card.dart::SolitaireCard"
+"quards::widgets::poker_card.dart::PokerCard" o-- "dart::ui::void Function()"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "quards::widgets::poker_card.dart::PokerCard"
+
+
+@enduml

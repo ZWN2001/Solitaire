@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /*
- * @Description 七个牌堆以及左面的翻开的牌堆
+ * @Description 七个牌堆以及左面的翻开的牌堆中反面朝上的牌堆
  * @Since version-1.0
  */
 
