@@ -97,15 +97,15 @@ class HoverReleaseDetails {
 class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   SolitaireGame game = SolitaireGame().game;
-  SolitaireCardLocation? hoveredLocation;
-  SolitaireCardLocation? draggedLocation;
-  Map<StandardCard, SolitaireCardLocation?> releasedCardOrigin = {};
+  SolitaireCardLocation? _hoveredLocation;
+  SolitaireCardLocation? _draggedLocation;
+  Map<StandardCard, SolitaireCardLocation?> _releasedCardOrigin = {};
 
   // Map<StandardCard, SolitaireCardLocation?> releasedCardDestination = {};
-  ValueNotifier<HoverReleaseDetails?> releasedNotifier = ValueNotifier(null);
-  SolitairePile? hoveredPile;
-  Set<SolitaireCard> animatingCards = HashSet();
-  late Map<Pile, GlobalKey> pileKeys = {
+  ValueNotifier<HoverReleaseDetails?> _releasedNotifier = ValueNotifier(null);
+  SolitairePile? _hoveredPile;
+  Set<SolitaireCard> _animatingCards = HashSet();
+  late Map<Pile, GlobalKey> _pileKeys = {
     for (Pile pile in game.allPiles) pile: GlobalKey()
   };
 
@@ -119,14 +119,14 @@ class _MainPageState extends State<MainPage>
 
   Offset get wasteCardOffset => const Offset(0, 0);
 
-  late final AnimationController winAnimationController = AnimationController(
+  late final AnimationController _winAnimationController = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 2000));
-  late final winFadeAnimation = CurvedAnimation(
-      parent: winAnimationController,
+  late final _winFadeAnimation = CurvedAnimation(
+      parent: _winAnimationController,
       curve: const Interval(0, 0.5),
       reverseCurve: const Interval(0.5, 1));
   late final winTextAnimation = CurvedAnimation(
-      parent: winAnimationController,
+      parent: _winAnimationController,
       curve: const Interval(0.5, 1, curve: Curves.elasticOut),
       reverseCurve: const Interval(0, 0));
 
@@ -139,7 +139,7 @@ class _MainPageState extends State<MainPage>
   //完成时展示动画
   void onGameWinUpdate() {
     if (game.won.value) {
-      winAnimationController.forward(from: 0);
+      _winAnimationController.forward(from: 0);
     }
   }
 
@@ -294,7 +294,7 @@ class _MainPageState extends State<MainPage>
               ),
               if (game.won.value)
                 FadeTransition(
-                  opacity: winFadeAnimation,
+                  opacity: _winFadeAnimation,
                   child: Container(
                     color: Colors.black.withOpacity(0.75),
                     child: Center(
@@ -362,7 +362,7 @@ class _MainPageState extends State<MainPage>
 
   //绑定快捷键
   Widget _buildShortcuts({required Widget child}) {
-    bool canUseShortcut = draggedLocation == null;
+    bool canUseShortcut = _draggedLocation == null;
     return Shortcuts(
         shortcuts: {
           LogicalKeySet(LogicalKeyboardKey.keyR): const NewGameIntent(),
@@ -438,11 +438,11 @@ class _MainPageState extends State<MainPage>
 
   Widget _buildCard(SolitaireCard card, SolitaireCardLocation location) {
     //draggedLocation 为空说明就没有被拖拽
-    final bool isDraggedByAnotherCard = draggedLocation != null
-        ? location.pile == draggedLocation!.pile &&
-            location.row >= draggedLocation!.row
+    final bool isDraggedByAnotherCard = _draggedLocation != null
+        ? location.pile == _draggedLocation!.pile &&
+            location.row >= _draggedLocation!.row
         : false;
-    final bool isReturning = animatingCards.contains(card);
+    final bool isReturning = _animatingCards.contains(card);
     final bool isRenderedByAnotherCard = isDraggedByAnotherCard || isReturning;
     return OverlapStackItem(
       zIndex: 1,
@@ -450,9 +450,9 @@ class _MainPageState extends State<MainPage>
         elevation: 10.0,
         hoverElevation: 10.0,
         data: location,
-        forceHovering: hoveredLocation != null
-            ? location.pile == hoveredLocation!.pile &&
-                location.row >= hoveredLocation!.row
+        forceHovering: _hoveredLocation != null
+            ? location.pile == _hoveredLocation!.pile &&
+                location.row >= _hoveredLocation!.row
             : null,
         onDoubleTap: () {
           tryMoveToFoundation(card, location);
@@ -461,57 +461,57 @@ class _MainPageState extends State<MainPage>
           if (hovered) {
             if (mounted) {
               setState(() {
-                hoveredLocation = location;
+                _hoveredLocation = location;
               });
             }
           } else {
             if (mounted) {
               setState(() {
-                hoveredLocation = null;
+                _hoveredLocation = null;
               });
             }
           }
         },
         onDragStart: () {
           setState(() {
-            draggedLocation = location;
+            _draggedLocation = location;
           });
         },
         onDragCancel: () {
           setState(() {
-            draggedLocation = null;
+            _draggedLocation = null;
             //拖动时只会确定 draggedLocation ， 如果不执行下面的添加操作就会导致
             // 在多张牌的拖动取消时，顶部的牌瞬间恢复原位，而只有底部的牌执行动画的问题
             location.pile.cards.skip(location.row + 1).forEach((card) {
-              animatingCards.add(card);
+              _animatingCards.add(card);
             });
           });
         },
         onDragReturn: () {
           //返回完成后从集合中删掉
           location.pile.cards.skip(location.row + 1).forEach((card) {
-            animatingCards.remove(card);
+            _animatingCards.remove(card);
           });
         },
         onDragAccept: (Offset releasedOffset) {
-          draggedLocation = null;
+          _draggedLocation = null;
           location.pile.cards.skip(location.row + 1).forEach((card) {
-            animatingCards.remove(card);
+            _animatingCards.remove(card);
           });
-          final targetPile = hoveredPile!;
+          final targetPile = _hoveredPile!;
           // final acceptedPile = releasedCardDestination[card.standardCard]!.pile;
           setState(() {
-            releasedNotifier.value = HoverReleaseDetails(
+            _releasedNotifier.value = HoverReleaseDetails(
               card: card.standardCard,
               acceptedPile: targetPile,
               offset: releasedOffset,
             );
-            game.moveToPile(releasedCardOrigin[card.standardCard]!, targetPile);
+            game.moveToPile(_releasedCardOrigin[card.standardCard]!, targetPile);
           });
         },
         canHover: game.canDrag(location),
         canDrag: game.canDrag(location),
-        releasedNotifier: releasedNotifier,
+        releasedNotifier: _releasedNotifier,
         shouldUpdateOnRelease: (HoverReleaseDetails? details) {
           if (details == null) return false;
           return details.card == card.standardCard;
@@ -553,7 +553,7 @@ class _MainPageState extends State<MainPage>
     final SolitaireCard card =
         SolitaireCard.fromStandardCard(ace.of(Suit.spades), isFaceDown: true);
     return Tooltip(
-      key: pileKeys[pile],
+      key: _pileKeys[pile],
       message: '翻开',
       waitDuration: const Duration(seconds: 1),
       child: Stack(
@@ -605,7 +605,7 @@ class _MainPageState extends State<MainPage>
       {Offset? verticalCardOffset, bool halfGutters = false}) {
     verticalCardOffset ??= tableauCardOffset;
     return DragTarget<SolitaireCardLocation>(
-      key: pileKeys[pile],
+      key: _pileKeys[pile],
       onLeave: (details) {},
       onWillAccept: (SolitaireCardLocation? location) {
         if (location == null) {
@@ -615,15 +615,15 @@ class _MainPageState extends State<MainPage>
         }
       },
       onMove: (DragTargetDetails<SolitaireCardLocation> details) {
-        if (hoveredPile != pile) {
+        if (_hoveredPile != pile) {
           setState(() {
-            hoveredPile = pile;
+            _hoveredPile = pile;
           });
         }
       },
       onAccept: (SolitaireCardLocation originalLocation) {
         final movedCard = game.cardAt(originalLocation);
-        releasedCardOrigin[movedCard.standardCard] = originalLocation;
+        _releasedCardOrigin[movedCard.standardCard] = originalLocation;
         // releasedCardDestination[movedCard.standardCard] =
         //     SolitaireCardLocation(row: pile.size, pile: pile);
       },
@@ -679,12 +679,12 @@ class _MainPageState extends State<MainPage>
   void drawFromStockPile() {
     setState(() {
       StockPileMove move = game.drawFromStock();
-      releasedNotifier.value = null;
+      _releasedNotifier.value = null;
       final Offset initialOffset = _getOffset(move.origin);
-      releasedCardOrigin[move.card.standardCard] = move.origin;
+      _releasedCardOrigin[move.card.standardCard] = move.origin;
       // releasedCardDestination[move.card.standardCard] = move.destination;
       final acceptedPile = move.destination.pile;
-      releasedNotifier.value = HoverReleaseDetails(
+      _releasedNotifier.value = HoverReleaseDetails(
           card: move.card.standardCard,
           acceptedPile: acceptedPile,
           offset: initialOffset);
@@ -695,12 +695,12 @@ class _MainPageState extends State<MainPage>
     setState(() {
       StockPileMoveBack move = game.backToStock();
       game.moves.clear(); //清空moves，因为该操作不可逆，这样可以保证逻辑上的正确
-      releasedNotifier.value = null;
+      _releasedNotifier.value = null;
       final Offset initialOffset = _getOffset(move.origin);
-      releasedCardOrigin[move.card.standardCard] = move.origin;
+      _releasedCardOrigin[move.card.standardCard] = move.origin;
       // releasedCardDestination[move.card.standardCard] = move.destination;
       final acceptedPile = move.destination.pile;
-      releasedNotifier.value = HoverReleaseDetails(
+      _releasedNotifier.value = HoverReleaseDetails(
           card: move.card.standardCard,
           acceptedPile: acceptedPile,
           offset: initialOffset);
@@ -709,14 +709,14 @@ class _MainPageState extends State<MainPage>
 
   void startNewGame(BuildContext context) {
     // final SolitaireGame thisGame = game;
-    hoveredLocation = null;
-    draggedLocation = null;
-    releasedCardOrigin = {};
+    _hoveredLocation = null;
+    _draggedLocation = null;
+    _releasedCardOrigin = {};
     // releasedCardDestination = {};
-    releasedNotifier = ValueNotifier(null);
-    hoveredPile = null;
-    animatingCards = HashSet();
-    Map<Pile, GlobalKey> key = pileKeys;
+    _releasedNotifier = ValueNotifier(null);
+    _hoveredPile = null;
+    _animatingCards = HashSet();
+    Map<Pile, GlobalKey> key = _pileKeys;
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
@@ -727,7 +727,7 @@ class _MainPageState extends State<MainPage>
         onPressed: () {
           setState(() {
             game = game.undoNewGame();
-            pileKeys = key;
+            _pileKeys = key;
           });
         },
       ),
@@ -738,8 +738,8 @@ class _MainPageState extends State<MainPage>
       game.newGame();
     });
     game.won.addListener(onGameWinUpdate);
-    pileKeys = {for (Pile pile in game.allPiles) pile: GlobalKey()};
-    winAnimationController.reverse();
+    _pileKeys = {for (Pile pile in game.allPiles) pile: GlobalKey()};
+    _winAnimationController.reverse();
   }
 
   void undoPreviousMove() {
@@ -765,10 +765,10 @@ class _MainPageState extends State<MainPage>
   void animatePileMove(SolitaireCard card, SolitaireCardLocation origin,
       SolitaireCardLocation destination) {
     final Offset initialOffset = _getOffset(origin);
-    releasedCardOrigin[card.standardCard] = destination;
+    _releasedCardOrigin[card.standardCard] = destination;
     // releasedCardDestination[card.standardCard] = origin;
     final acceptedPile = origin.pile;
-    releasedNotifier.value = HoverReleaseDetails(
+    _releasedNotifier.value = HoverReleaseDetails(
       card: card.standardCard,
       acceptedPile: acceptedPile,
       offset: initialOffset,
@@ -776,7 +776,7 @@ class _MainPageState extends State<MainPage>
   }
 
   Offset _getOffset(SolitaireCardLocation location) {
-    final GlobalKey pileKey = pileKeys[location.pile]!;
+    final GlobalKey pileKey = _pileKeys[location.pile]!;
     final Offset offset =
         (pileKey.currentContext!.findRenderObject() as RenderBox)
             .localToGlobal(Offset.zero);
