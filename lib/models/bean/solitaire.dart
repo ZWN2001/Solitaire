@@ -5,43 +5,48 @@ import 'card.dart';
 import 'deck.dart';
 import 'moves.dart';
 import 'pile.dart';
+
 // typedef StandardPile = Pile<StandardCard>;
 typedef SolitairePile = Pile<SolitaireCard>;
-class SolitaireGame {
 
+class SolitaireGame {
   static const int _pileCount = 7;
   static const int _foundationCount = 4;
 
-  late  SolitaireStock stock;
-  late  List<SolitairePile> tableauPiles;
-  late  List<SolitairePile> drawablePiles;
-  late  List<SolitairePile> allPiles;
-  late  List<SolitairePile> foundations;
-  late  List<Move> moves;
-  late  List<Move> undoneMoves;
+  late SolitaireStock stock;
+  late List<SolitairePile> tableauPiles;
+  late List<SolitairePile> drawablePiles;
+  late List<SolitairePile> allPiles;
+  late List<SolitairePile> foundations;
+  late List<Move> moves;
+  late List<Move> undoneMoves;
   late final SolitaireGame _solitaireGame = SolitaireGame();
   final ValueNotifier<bool> won = ValueNotifier(false);
-  late SolitaireStock _oldStock ;
-  late List<SolitairePile> _oldTableauPiles;
-  late  List<SolitairePile> _oldDrawablePiles;
-  late  List<SolitairePile> _oldAllPiles;
-  late  List<SolitairePile> _oldFoundations;
-  late  List<Move> _oldMoves;
-  late  List<Move> _oldUndoneMoves;
-  SolitaireGame() {initGame();}
+  late SolitaireStock _oldStock;
 
-  SolitaireGame get game{
-      return _solitaireGame;
+  late List<SolitairePile> _oldTableauPiles;
+  late List<SolitairePile> _oldDrawablePiles;
+  late List<SolitairePile> _oldAllPiles;
+  late List<SolitairePile> _oldFoundations;
+  late List<Move> _oldMoves;
+  late List<Move> _oldUndoneMoves;
+
+  SolitaireGame() {
+    initGame();
   }
 
-  void initGame(){
+  SolitaireGame get game {
+    return _solitaireGame;
+  }
+
+  void initGame() {
     final StandardDeck deck = StandardDeck.shuffled();
     tableauPiles = List.generate(
         _pileCount,
-            (index) => SolitairePile(deck
+        (index) => SolitairePile(deck
             .takeN(index + 1)
             .map((card) =>
-            SolitaireCard.fromStandardCard(card, isFaceDown: true))
+                SolitaireCard.fromStandardCard(card, isFaceDown: true))
             .toList()));
     //将七个牌堆的第一张牌翻转
     for (SolitairePile pile in tableauPiles) {
@@ -62,7 +67,7 @@ class SolitaireGame {
     ];
   }
 
-  void newGame(){
+  void newGame() {
     _oldStock = stock;
     _oldTableauPiles = tableauPiles;
     _oldDrawablePiles = drawablePiles;
@@ -73,7 +78,7 @@ class SolitaireGame {
     initGame();
   }
 
-  SolitaireGame undoNewGame(){
+  SolitaireGame undoNewGame() {
     _solitaireGame.stock = _oldStock;
     _solitaireGame.tableauPiles = _oldTableauPiles;
     _solitaireGame.drawablePiles = _oldDrawablePiles;
@@ -143,14 +148,16 @@ class SolitaireGame {
     if (isSamePile) return false;
 
     bool isFoundation = isFoundationPile(targetPile);
-    if (isFoundation) {//最右面的四个牌堆
+    if (isFoundation) {
+      //最右面的四个牌堆
       bool isTopCard = location.row == location.pile.size - 1;
       if (!isTopCard) {
         return false;
       }
 
       SolitaireCard card = cardAt(location);
-      if (targetPile.isEmpty) {//牌堆为空，只能为A
+      if (targetPile.isEmpty) {
+        //牌堆为空，只能为A
         return card.value == ace;
       } else {
         final SolitaireCard topCard = targetPile.topCard!;
@@ -161,18 +168,25 @@ class SolitaireGame {
     SolitaireCard? targetCard = targetPile.topCard;
     if (targetCard != null) {
       //值相差一，花色不同
-      return movedCard.value == targetCard.value - 1 &&targetCard.canBePlacedBelow(movedCard);
-          // targetCard.isRed != movedCard.isRed;
+      return movedCard.value == targetCard.value - 1 &&
+          targetCard.canBePlacedBelow(movedCard);
+      // targetCard.isRed != movedCard.isRed;
     } else {
       return movedCard.value == king;
     }
   }
 
-  bool isFoundationPile(SolitairePile pile) {return foundations.contains(pile);}
+  bool isFoundationPile(SolitairePile pile) {
+    return foundations.contains(pile);
+  }
 
-  bool isWastePile(SolitairePile pile) {return stock.wastePile == pile;}
+  bool isWastePile(SolitairePile pile) {
+    return stock.wastePile == pile;
+  }
 
-  bool isStockPile(SolitairePile pile) {return stock.stockPile == pile;}
+  bool isStockPile(SolitairePile pile) {
+    return stock.stockPile == pile;
+  }
 
   bool canDrag(SolitaireCardLocation location) {
     bool isFaceDown = cardAt(location).isFaceDown;
@@ -187,6 +201,7 @@ class SolitaireGame {
   }
 
   Move? get previousMove => moves.isNotEmpty ? moves.last : null;
+
   Move? get previousUndoneMove =>
       undoneMoves.isNotEmpty ? undoneMoves.last : null;
 
@@ -283,8 +298,10 @@ class SolitaireCardLocation extends Equatable {
     required this.row,
     required this.pile,
   });
+
   //牌数
   final int row;
+
   //牌堆
   final SolitairePile pile;
 

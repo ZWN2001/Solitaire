@@ -5,14 +5,18 @@ abstract class Deck<Card> {
   Deck(this.cards) : _size = cards.length;
 
   List<Card> cards;
+
   int get size => _size;
+
   set size(int value) {
     //返回指定范围内离当前数值最近的数，如果num在返回内返回num
     _size = value.clamp(0, double.infinity).toInt();
   }
 
   int _size;
+
   bool get isEmpty => cards.isEmpty;
+
   bool get isNotEmpty => cards.isNotEmpty;
 
   Card peek() {
@@ -54,31 +58,37 @@ abstract class Deck<Card> {
 class StandardDeck extends Deck<StandardCard> {
   StandardDeck.shuffled()
       : super(Suit.values
-                //对于四种花色
+            //对于四种花色
             .expand((suit) =>
                 //随机生成 1~13（A~K）
                 List.generate(13, (index) => StandardCard(suit, index + 1)))
             .toList()
-              ..shuffle());
+          ..shuffle());
 }
 
 enum Suit {
   ///梅花
   clubs,
+
   ///方块
   diamonds,
+
   ///红桃
   hearts,
+
   ///黑桃
   spades,
 }
 
 ///A
 const ace = 1;
+
 ///J
 const jack = 11;
+
 ///Q
 const queen = 12;
+
 ///K
 const king = 13;
 

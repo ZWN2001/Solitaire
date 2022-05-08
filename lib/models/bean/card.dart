@@ -14,6 +14,7 @@ class SolitaireCard {
    * @Since version-1.0
    */
   SolitaireCard(Suit suit, int value) : _card = StandardCard(suit, value);
+
   SolitaireCard.fromStandardCard(this._card, {required bool isFaceDown}) {
     _faceDown = isFaceDown;
   }
@@ -23,7 +24,9 @@ class SolitaireCard {
   StandardCard get standardCard => _card;
 
   Suit get suit => _card.suit;
+
   int get value => _card.value;
+
   bool get isRed => _card.isRed;
 
   bool _faceDown = false;

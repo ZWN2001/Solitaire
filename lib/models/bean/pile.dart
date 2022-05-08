@@ -36,6 +36,7 @@ class Pile<Card> {
   }
 
   bool get isEmpty => _cards.isEmpty;
+
   bool get isNotEmpty => _cards.isNotEmpty;
 
   Pile<Card> removePileFrom(int index) {

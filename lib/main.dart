@@ -18,14 +18,15 @@ import 'widgets/overlap_stack.dart';
 import 'widgets/poker_card.dart';
 
 void main() {
-  try{
-    if(Platform.isAndroid ||Platform.isIOS){
+  try {
+    if (Platform.isAndroid || Platform.isIOS) {
       WidgetsFlutterBinding.ensureInitialized();
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]).then((_){
+      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft])
+          .then((_) {
         runApp(Quards());
       });
-    }else{
+    } else {
       runApp(Quards());
       doWhenWindowReady(() {
         appWindow.title = "Quards Solitaire";
@@ -36,9 +37,9 @@ void main() {
         appWindow.show();
       });
     }
-  }catch(e){
+  } catch (e) {
     //通常web会报这个错
-    if(e.toString() == 'Unsupported operation: Platform._operatingSystem'){
+    if (e.toString() == 'Unsupported operation: Platform._operatingSystem') {
       runApp(Quards());
       doWhenWindowReady(() {
         appWindow.title = "Quards Solitaire";
@@ -50,7 +51,6 @@ void main() {
       });
     }
   }
-
 }
 
 class Quards extends StatelessWidget {
@@ -68,7 +68,8 @@ class Quards extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'quards - solitaire',
-      theme: data.copyWith(textTheme: GoogleFonts.alataTextTheme(data.textTheme)),
+      theme:
+          data.copyWith(textTheme: GoogleFonts.alataTextTheme(data.textTheme)),
       home: const MainPage(),
     );
   }
@@ -84,9 +85,11 @@ class MainPage extends StatefulWidget {
 class HoverReleaseDetails {
   const HoverReleaseDetails(
       {required this.card, required this.acceptedPile, required this.offset});
+
   //牌
   final StandardCard card;
   final Offset offset;
+
   //接受前的牌堆
   final SolitairePile acceptedPile;
 }
@@ -97,6 +100,7 @@ class _MainPageState extends State<MainPage>
   SolitaireCardLocation? hoveredLocation;
   SolitaireCardLocation? draggedLocation;
   Map<StandardCard, SolitaireCardLocation?> releasedCardOrigin = {};
+
   // Map<StandardCard, SolitaireCardLocation?> releasedCardDestination = {};
   ValueNotifier<HoverReleaseDetails?> releasedNotifier = ValueNotifier(null);
   SolitairePile? hoveredPile;
@@ -106,9 +110,13 @@ class _MainPageState extends State<MainPage>
   };
 
   double get screenUnit => calculateScreenUnit();
+
   double get gutterWidth => screenUnit * 2;
+
   double get cardWidth => screenUnit * 10;
+
   Offset get tableauCardOffset => Offset(0, screenUnit * 4);
+
   Offset get wasteCardOffset => const Offset(0, 0);
 
   late final AnimationController winAnimationController = AnimationController(
@@ -162,51 +170,51 @@ class _MainPageState extends State<MainPage>
                 alignment: Alignment.bottomLeft,
                 children: [
                   Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                              //左下角正方形
-                              Transform.rotate(
-                                angle: pi / 4,
-                                child: Container(
-                                  decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Stack(
+                          children: [
+                            //左下角正方形
+                            Transform.rotate(
+                              angle: pi / 4,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                height: Theme.of(context)
+                                    .textTheme
+                                    .headline2!
+                                    .fontSize,
+                                width: Theme.of(context)
+                                    .textTheme
+                                    .headline2!
+                                    .fontSize,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: _buildAppName(),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'Solitaire',
+                          style:
+                              Theme.of(context).textTheme.headline4?.copyWith(
                                     color: Theme.of(context)
                                         .primaryColor
                                         .withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(8.0),
                                   ),
-                                  height: Theme.of(context)
-                                      .textTheme
-                                      .headline2!
-                                      .fontSize,
-                                  width: Theme.of(context)
-                                      .textTheme
-                                      .headline2!
-                                      .fontSize,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: _buildAppName(),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            'Solitaire',
-                            style:
-                            Theme.of(context).textTheme.headline4?.copyWith(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.6),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
                   Padding(
                     padding: EdgeInsets.only(top: gutterWidth),
                     child: Row(
@@ -229,14 +237,14 @@ class _MainPageState extends State<MainPage>
                               const Divider(),
                               IconButton(
                                 tooltip: '撤销 (Ctrl-Z)',
-                                onPressed: game.canUndo()
-                                    ? undoPreviousMove : null,
+                                onPressed:
+                                    game.canUndo() ? undoPreviousMove : null,
                                 icon: const Icon(Icons.undo),
                               ),
                               IconButton(
                                 tooltip: '重做 (Ctrl-Shift Z/Ctrl-Y)',
-                                onPressed: game.canRedo()
-                                    ? redoPreviousMove : null,
+                                onPressed:
+                                    game.canRedo() ? redoPreviousMove : null,
                                 icon: const Icon(Icons.redo),
                               ),
                             ],
@@ -271,7 +279,8 @@ class _MainPageState extends State<MainPage>
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            for (SolitairePile foundation in game.foundations) ...{
+                            for (SolitairePile foundation
+                                in game.foundations) ...{
                               _buildPile(foundation,
                                   verticalCardOffset: Offset.zero),
                               SizedBox(height: gutterWidth),
@@ -283,7 +292,7 @@ class _MainPageState extends State<MainPage>
                   ),
                 ],
               ),
-              if(game.won.value)
+              if (game.won.value)
                 FadeTransition(
                   opacity: winFadeAnimation,
                   child: Container(
@@ -320,7 +329,6 @@ class _MainPageState extends State<MainPage>
                     ),
                   ),
                 ),
-
             ],
           ),
         ),
@@ -451,13 +459,13 @@ class _MainPageState extends State<MainPage>
         },
         onHover: (bool hovered) {
           if (hovered) {
-            if(mounted){
+            if (mounted) {
               setState(() {
                 hoveredLocation = location;
               });
             }
           } else {
-            if(mounted) {
+            if (mounted) {
               setState(() {
                 hoveredLocation = null;
               });
@@ -565,23 +573,24 @@ class _MainPageState extends State<MainPage>
                     elevation: elevation,
                     width: cardWidth,
                     onTap: () {
-                      if(pile.size>0){
+                      if (pile.size > 0) {
                         drawFromStockPile();
-                      }else{
+                      } else {
                         _moveStockBack();
                       }
                     },
                   ),
-                  if(pile.size>0)
-                  Center(
-                    child: Icon(
-                      Icons.pan_tool,
-                      color: Theme.of(context).hintColor,
-                    ),
-                  ),
-                  if(pile.size == 0)
+                  if (pile.size > 0)
                     Center(
-                      child:  Icon(Icons.refresh,color: Theme.of(context).hintColor),
+                      child: Icon(
+                        Icons.pan_tool,
+                        color: Theme.of(context).hintColor,
+                      ),
+                    ),
+                  if (pile.size == 0)
+                    Center(
+                      child: Icon(Icons.refresh,
+                          color: Theme.of(context).hintColor),
                     ),
                 ],
               );
@@ -682,20 +691,20 @@ class _MainPageState extends State<MainPage>
     });
   }
 
-  void _moveStockBack(){
+  void _moveStockBack() {
     setState(() {
-    StockPileMoveBack move = game.backToStock();
-    game.moves.clear();//清空moves，因为该操作不可逆，这样可以保证逻辑上的正确
-    releasedNotifier.value = null;
-    final Offset initialOffset = _getOffset(move.origin);
-    releasedCardOrigin[move.card.standardCard] = move.origin;
-    // releasedCardDestination[move.card.standardCard] = move.destination;
-    final acceptedPile = move.destination.pile;
-    releasedNotifier.value = HoverReleaseDetails(
-        card: move.card.standardCard,
-        acceptedPile: acceptedPile,
-        offset: initialOffset);
-  });
+      StockPileMoveBack move = game.backToStock();
+      game.moves.clear(); //清空moves，因为该操作不可逆，这样可以保证逻辑上的正确
+      releasedNotifier.value = null;
+      final Offset initialOffset = _getOffset(move.origin);
+      releasedCardOrigin[move.card.standardCard] = move.origin;
+      // releasedCardDestination[move.card.standardCard] = move.destination;
+      final acceptedPile = move.destination.pile;
+      releasedNotifier.value = HoverReleaseDetails(
+          card: move.card.standardCard,
+          acceptedPile: acceptedPile,
+          offset: initialOffset);
+    });
   }
 
   void startNewGame(BuildContext context) {
@@ -707,9 +716,9 @@ class _MainPageState extends State<MainPage>
     releasedNotifier = ValueNotifier(null);
     hoveredPile = null;
     animatingCards = HashSet();
-    Map<Pile,GlobalKey> key = pileKeys;
+    Map<Pile, GlobalKey> key = pileKeys;
 
-    ScaffoldMessenger.of(context).showSnackBar( SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       width: 300,
       content: const Text('已开始新游戏'),
@@ -729,9 +738,7 @@ class _MainPageState extends State<MainPage>
       game.newGame();
     });
     game.won.addListener(onGameWinUpdate);
-    pileKeys = {
-      for (Pile pile in game.allPiles) pile: GlobalKey()
-    };
+    pileKeys = {for (Pile pile in game.allPiles) pile: GlobalKey()};
     winAnimationController.reverse();
   }
 

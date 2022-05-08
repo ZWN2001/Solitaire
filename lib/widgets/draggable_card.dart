@@ -65,6 +65,7 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
     with TickerProviderStateMixin {
   final double maxRotationDegrees = 15;
   final double maxVelocity = 2500;
+
   double get maxRotation => maxRotationDegrees / 180 * pi;
 
   final GlobalKey _gestureDetectorKey = GlobalKey();
@@ -89,6 +90,7 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
   Offset draggableReleasedOffset = Offset.zero;
 
   double get hoverPercentage => hoverAnimation.value;
+
   double get elevation => lerpDouble(
       widget.elevation, widget.hoverElevation, hoverAnimation.value)!;
 
@@ -196,9 +198,9 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
               maxSimultaneousDrags: widget.canDrag ? null : 0,
               data: widget.data,
               feedback: Transform.scale(
-                      scale: hoveredScale,
-                      child: widget.builder(
-                          context, widget.child, elevation, true, scale)),
+                  scale: hoveredScale,
+                  child: widget.builder(
+                      context, widget.child, elevation, true, scale)),
               onDragStarted: () {
                 isHovering = true;
                 if (widget.onDragStart != null) widget.onDragStart!();

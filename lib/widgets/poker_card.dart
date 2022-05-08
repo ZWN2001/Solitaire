@@ -93,7 +93,8 @@ class PokerCard extends StatelessWidget {
               child: Stack(
                 children: [
                   if (card != null) ...{
-                    if (!card!.isFaceDown) ...{ //正面朝上
+                    if (!card!.isFaceDown) ...{
+                      //正面朝上
                       _buildCardFront(context),
                     } else ...{
                       _buildCardBack(context),
