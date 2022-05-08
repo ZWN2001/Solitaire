@@ -234,7 +234,6 @@ class _DraggableCardState<T extends Object> extends State<DraggableCard<T>>
                   },
                   child: widget.builder(context, widget.child, elevation,
                       offsetAnimation.value != 0, scale),
-                  // TODO: Fix redo animation when more than one card is moved
                 ),
               ),
             ),

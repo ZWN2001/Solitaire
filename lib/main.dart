@@ -93,7 +93,7 @@ class HoverReleaseDetails {
 
 class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
-  SolitaireGame game = SolitaireGame();
+  SolitaireGame game = SolitaireGame().game;
   SolitaireCardLocation? hoveredLocation;
   SolitaireCardLocation? draggedLocation;
   Map<StandardCard, SolitaireCardLocation?> releasedCardOrigin = {};
@@ -699,7 +699,7 @@ class _MainPageState extends State<MainPage>
   }
 
   void startNewGame(BuildContext context) {
-    final SolitaireGame thisGame = game;
+    // final SolitaireGame thisGame = game;
     hoveredLocation = null;
     draggedLocation = null;
     releasedCardOrigin = {};
@@ -717,14 +717,17 @@ class _MainPageState extends State<MainPage>
         label: '撤销',
         onPressed: () {
           setState(() {
-            game = thisGame;
+            game = game.undoNewGame();
             pileKeys = key;
           });
         },
       ),
     ));
 
-    game = SolitaireGame();
+    // game = SolitaireGame();
+    setState(() {
+      game.newGame();
+    });
     game.won.addListener(onGameWinUpdate);
     pileKeys = {
       for (Pile pile in game.allPiles) pile: GlobalKey()

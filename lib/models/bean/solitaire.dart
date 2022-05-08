@@ -12,16 +12,29 @@ class SolitaireGame {
   static const int _pileCount = 7;
   static const int _foundationCount = 4;
 
-  late final SolitaireStock stock;
-  late final List<SolitairePile> tableauPiles;
-  late final List<SolitairePile> drawablePiles;
-  late final List<SolitairePile> allPiles;
-  late final List<SolitairePile> foundations;
-  late final List<Move> moves;
-  late final List<Move> undoneMoves;
+  late  SolitaireStock stock;
+  late  List<SolitairePile> tableauPiles;
+  late  List<SolitairePile> drawablePiles;
+  late  List<SolitairePile> allPiles;
+  late  List<SolitairePile> foundations;
+  late  List<Move> moves;
+  late  List<Move> undoneMoves;
+  late final SolitaireGame _solitaireGame = SolitaireGame();
   final ValueNotifier<bool> won = ValueNotifier(false);
+  late SolitaireStock _oldStock ;
+  late List<SolitairePile> _oldTableauPiles;
+  late  List<SolitairePile> _oldDrawablePiles;
+  late  List<SolitairePile> _oldAllPiles;
+  late  List<SolitairePile> _oldFoundations;
+  late  List<Move> _oldMoves;
+  late  List<Move> _oldUndoneMoves;
+  SolitaireGame() {initGame();}
 
-  SolitaireGame() {
+  SolitaireGame get game{
+      return _solitaireGame;
+  }
+
+  void initGame(){
     final StandardDeck deck = StandardDeck.shuffled();
     tableauPiles = List.generate(
         _pileCount,
@@ -49,6 +62,27 @@ class SolitaireGame {
     ];
   }
 
+  void newGame(){
+    _oldStock = stock;
+    _oldTableauPiles = tableauPiles;
+    _oldDrawablePiles = drawablePiles;
+    _oldAllPiles = allPiles;
+    _oldFoundations = foundations;
+    _oldMoves = moves;
+    _oldUndoneMoves = undoneMoves;
+    initGame();
+  }
+
+  SolitaireGame undoNewGame(){
+    _solitaireGame.stock = _oldStock;
+    _solitaireGame.tableauPiles = _oldTableauPiles;
+    _solitaireGame.drawablePiles = _oldDrawablePiles;
+    _solitaireGame.allPiles = _oldAllPiles;
+    _solitaireGame.foundations = _oldFoundations;
+    _solitaireGame.moves = _oldMoves;
+    _solitaireGame.undoneMoves = _oldUndoneMoves;
+    return _solitaireGame;
+  }
 
   SolitaireCard cardAt(SolitaireCardLocation location) {
     return location.pile.cardAt(location.row);
