@@ -242,7 +242,7 @@ class _MainPageState extends State<MainPage>
                                 icon: const Icon(Icons.undo),
                               ),
                               IconButton(
-                                tooltip: '重做 (Ctrl-Shift Z/Ctrl-Y)',
+                                tooltip: '重做 (Ctrl-Y)',
                                 onPressed:
                                     game.canRedo() ? redoPreviousMove : null,
                                 icon: const Icon(Icons.redo),
@@ -370,8 +370,6 @@ class _MainPageState extends State<MainPage>
               const UndoIntent(),
           LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY):
               const RedoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.shift,
-              LogicalKeyboardKey.keyZ): const RedoIntent(),
           LogicalKeySet(LogicalKeyboardKey.space):
               const MoveCardsToFoundationIntent(),
           // LogicalKeySet(LogicalKeyboardKey.keyD): const DrawFromStockIntent(),
@@ -382,7 +380,9 @@ class _MainPageState extends State<MainPage>
               onInvoke: (UndoIntent intent) {
                 if (canUseShortcut) {
                   setState(() {
-                    if (game.canUndo()) undoPreviousMove();
+                    if (game.canUndo()) {
+                      undoPreviousMove();
+                    }
                   });
                 }
                 return null;
