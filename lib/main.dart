@@ -455,7 +455,9 @@ class _MainPageState extends State<MainPage>
                 location.row >= _hoveredLocation!.row
             : null,
         onDoubleTap: () {
-          tryMoveToFoundation(card, location);
+          if(!card.isFaceDown) {
+            tryMoveToFoundation(card, location);
+          }
         },
         onHover: (bool hovered) {
           if (hovered) {
@@ -581,16 +583,22 @@ class _MainPageState extends State<MainPage>
                     },
                   ),
                   if (pile.size > 0)
-                    Center(
-                      child: Icon(
-                        Icons.pan_tool,
-                        color: Theme.of(context).hintColor,
+                    IgnorePointer(
+                      ignoring: true,
+                      child: Center(
+                        child: Icon(
+                          Icons.pan_tool,
+                          color: Theme.of(context).hintColor,
+                        ),
                       ),
                     ),
                   if (pile.size == 0)
-                    Center(
-                      child: Icon(Icons.refresh,
-                          color: Theme.of(context).hintColor),
+                    IgnorePointer(
+                      ignoring: true,
+                      child: Center(
+                        child: Icon(Icons.refresh,
+                            color: Theme.of(context).hintColor),
+                      ),
                     ),
                 ],
               );
