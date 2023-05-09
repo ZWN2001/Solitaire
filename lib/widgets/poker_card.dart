@@ -147,7 +147,6 @@ class PokerCard extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16.0),
-                      color: Theme.of(context).hoverColor,
                     ),
                   ),
                 ),
@@ -163,8 +162,9 @@ class PokerCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16.0),
-      child: Container(
-        padding: const EdgeInsets.all(32.0),
+      child: SizedBox(
+        width: 300,
+        height: 500,
         child: Ink(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
